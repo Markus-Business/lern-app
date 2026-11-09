@@ -339,6 +339,10 @@ const SUBJECTS = [
  "icon": "💡",
  "title": "Kapitel 2: Elektrischer Strom",
  "book": "Impulse Physik, S. 23–42",
+ audios: [
+  { src: "podcast-k2.mp3", seconds: 1855, main: true, title: "Wie Elektronen wirklich durch Kabel fließen", length: "31 Min.",
+    note: "Inhaltsübersicht mit Sprungmarken folgt. Der Podcast ist noch nicht gegen das Buch geprüft – im Zweifel gilt das Buch." }
+ ],
  "refs": {
   "k24": {
    "p": 24,
@@ -1422,7 +1426,7 @@ function playerHtml(au, k, open){
     </div>
     <div class="small muted" id="audpos-${k}"></div>
     ${au.note ? `<div class="small" style="margin-top:6px;background:var(--warn-soft);border-radius:10px;padding:8px 10px">⚠️ ${esc(au.note)}</div>` : ""}
-    <details ${open?"open":""} style="margin-top:6px"><summary class="small" style="cursor:pointer;font-weight:700;color:var(--accent)">Inhaltsübersicht</summary>${tocList(au, k)}</details>`;
+    ${au.toc && au.toc.length ? `<details ${open?"open":""} style="margin-top:6px"><summary class="small" style="cursor:pointer;font-weight:700;color:var(--accent)">Inhaltsübersicht</summary>${tocList(au, k)}</details>` : ""}`;
 }
 function audioBlock(ch){
   if(!ch.audios || !ch.audios.length) return "";
@@ -1817,7 +1821,7 @@ function renderLearn(setId){
     html += `<div class="card">
       <div><span class="ref-page">${esc(item.ref.page)}</span> · <b>${esc(item.ref.topic)}</b></div>
       <div class="small muted" style="margin-top:3px">${esc(item.ref.where)}</div>
-      ${(() => { const au = mainAudio(f.ch); if(!au || item.ref.toc===undefined || !au.toc[item.ref.toc]) return ""; const k = f.ch.audios.indexOf(au); const s = au.toc[item.ref.toc]; return `<button class="speak" data-jump="${s.t}" style="margin-top:8px">🎧 Anhören: „${esc(s.title)}“ ab ${fmtTime(s.t)}</button>`; })()}`;
+      ${(() => { const au = mainAudio(f.ch); if(!au || !au.toc || item.ref.toc===undefined || !au.toc[item.ref.toc]) return ""; const k = f.ch.audios.indexOf(au); const s = au.toc[item.ref.toc]; return `<button class="speak" data-jump="${s.t}" style="margin-top:8px">🎧 Anhören: „${esc(s.title)}“ ab ${fmtTime(s.t)}</button>`; })()}`;
     for(const q of item.qs){
       const a = (st.lastAnswers||{})[q.id];
       html += `<div class="wrongq">${q.context?`<span class="muted">${fmtSub(q.context)}</span><br>`:""}${fmtSub(q.prompt)}<div class="ans-line">Deine Antwort: <span class="ans-bad">${esc(answerText(q, a && a.given))}</span></div></div>`;
