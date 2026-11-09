@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lern-App</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lern-App">
+<meta name="theme-color" content="#f5f3ee">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f3ee; --card:#ffffff; --ink:#1f2430; --muted:#6b7180; --line:#e4e1d8;
+    --accent:#2f6fed; --accent-soft:#e6eefe; --ok:#1e9e6a; --ok-soft:#e3f5ec;
+    --bad:#d6453d; --bad-soft:#fbe7e5; --warn:#c98a12; --warn-soft:#fbf1dc;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.45}
+  #app{max-width:560px;margin:0 auto;padding:16px 16px 48px}
+  h1{font-size:1.5rem;margin:.2em 0 .1em;font-weight:800}
+  h2{font-size:1.2rem;margin:1.2em 0 .5em;font-weight:800}
+  h3{font-size:1.02rem;margin:0 0 .3em;font-weight:800}
+  p{margin:.4em 0}
+  .muted{color:var(--muted)}
+  .small{font-size:.88rem}
+  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:10px;min-height:40px}
+  .topbar .grow{flex:1}
+  .iconbtn{border:none;background:var(--card);border:1px solid var(--line);border-radius:12px;width:42px;height:42px;font-size:1.1rem;cursor:pointer;color:var(--ink)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:12px 0}
+  .card.tap{cursor:pointer;transition:transform .08s}
+  .card.tap:active{transform:scale(.99)}
+  .row{display:flex;align-items:center;gap:12px}
+  .row .grow{flex:1;min-width:0}
+  .btn{display:block;width:100%;border:none;border-radius:14px;padding:15px 16px;font:inherit;font-weight:800;font-size:1.02rem;cursor:pointer;background:var(--accent);color:#fff;margin:10px 0;text-align:center}
+  .btn.secondary{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .btn.ok{background:var(--ok)}
+  .btn.bad{background:var(--bad)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.inline{display:inline-block;width:auto;padding:9px 14px;font-size:.92rem;margin:4px 0}
+  .badge{display:inline-block;font-size:.78rem;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .b-new{background:var(--accent-soft);color:var(--accent)}
+  .b-quiz{background:var(--accent-soft);color:var(--accent)}
+  .b-learn{background:var(--warn-soft);color:var(--warn)}
+  .b-done{background:var(--ok-soft);color:var(--ok)}
+  .progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:6px 0 14px}
+  .progress > div{height:100%;background:var(--accent);border-radius:99px;transition:width .2s}
+  .context{background:var(--accent-soft);border-radius:12px;padding:10px 12px;font-size:.92rem;margin-bottom:10px}
+  .prompt{font-size:1.18rem;font-weight:700;margin:6px 0 14px}
+  .opt{display:block;width:100%;text-align:left;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:14px;margin:9px 0;font:inherit;font-size:1rem;cursor:pointer;color:var(--ink)}
+  .opt:active{border-color:var(--accent)}
+  .opt.picked-ok{border-color:var(--ok);background:var(--ok-soft)}
+  .opt.picked-bad{border-color:var(--bad);background:var(--bad-soft)}
+  .tfrow{display:flex;gap:10px}
+  .tfrow .opt{text-align:center;font-weight:800}
+  input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size:1.05rem;padding:13px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink)}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  .feedback{border-radius:14px;padding:14px;font-weight:800;margin:12px 0;font-size:1.05rem}
+  .feedback.ok{background:var(--ok-soft);color:var(--ok)}
+  .feedback.bad{background:var(--bad-soft);color:var(--bad)}
+  .tip{font-size:.85rem;color:var(--muted);margin-top:4px}
+  .speak{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:6px 10px;font:inherit;font-size:.85rem;cursor:pointer;color:var(--ink)}
+  .ref-page{font-weight:800;color:var(--accent)}
+  .wrongq{border-top:1px dashed var(--line);padding-top:8px;margin-top:8px;font-size:.92rem}
+  .check{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:700;cursor:pointer}
+  .check input{width:22px;height:22px}
+  .steps{background:var(--warn-soft);border-radius:14px;padding:12px 14px}
+  .steps ol{margin:.3em 0 0 1.1em;padding:0}
+  .steps li{margin:.25em 0}
+  .err{color:var(--bad);font-weight:700;font-size:.92rem;min-height:1.2em;margin-top:6px}
+  .kv{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:7px 0;font-size:.92rem}
+  .kv:last-child{border-bottom:none}
+  .ans-line{font-size:.9rem;margin:3px 0}
+  .ans-bad{color:var(--bad);font-weight:700}
+  .ans-ok{color:var(--ok);font-weight:700}
+  .seg{display:flex;gap:8px;margin:8px 0}
+  .seg label{flex:1;border:2px solid var(--line);border-radius:12px;padding:10px;text-align:center;font-weight:700;cursor:pointer;font-size:.92rem}
+  .seg input{display:none}
+  .seg input:checked + span{color:var(--accent)}
+  .seg label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+  .big-emoji{font-size:3.2rem;text-align:center;margin:10px 0 0}
+  .center{text-align:center}
+  .statusbox summary::-webkit-details-marker,.chapter summary::-webkit-details-marker{display:none}
+  .chapter[open] .chev{transform:rotate(180deg)}
+  .statusbox[open] .chev{transform:rotate(180deg)}
+  .chev{display:inline-block;transition:transform .15s}
+  .player{margin-top:10px}
+  .seek{width:100%;accent-color:var(--accent);height:28px}
+  .pbtns{display:flex;justify-content:center;align-items:center;gap:18px;margin-top:4px}
+  .pbtn{border:1px solid var(--line);background:var(--card);border-radius:999px;width:56px;height:56px;font:inherit;font-size:1.35rem;line-height:1;cursor:pointer;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .pbtn small{font-size:.62rem;font-weight:800;margin-top:1px}
+  .pbtn.play{width:68px;height:68px;background:var(--accent);color:#fff;border:none;font-size:1.5rem}
+  .footer-note{font-size:.8rem;color:var(--muted);text-align:center;margin-top:28px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   INHALTE  –  hier werden später weitere Fächer/Kapitel ergänzt
+   Fragetypen: tf (wahr/falsch), mc (Auswahl), text (Eingabe)
+   Jede Frage verweist über refs auf Buchstellen (REFS im Kapitel).
+   ========================================================= */
+const SUBJECTS = [
+  {
+    id: "physik",
+    name: "Physik",
+    icon: "⚛️",
+    chapters: [
+      {
+        id: "phy-k1",
+        icon: "🔋",
+        title: "Kapitel 1: Energie",
+        book: "Impulse Physik, S. 5–21",
+        audios: [
+          { src: "podcast-k1-v2.mp3", seconds: 1680, main: true, title: "Warum Energie niemals verschwindet", length: "28 Min.",
+            note: "Zwei Korrekturen: „Umwandeln“ ist nicht falsch, das Buch sagt nur „überführen“. Und auf halber Höhe hat man halb so viel Bewegungsenergie – nicht halbe Geschwindigkeit.",
+            toc: [
+              { t: 0, title: "Einstieg: Energie verschwindet nie", points: ["Energie wird nicht verbraucht, sie wechselt nur ihre Form"] },
+              { t: 111, title: "Lagerfeuer: Energie abgeben und aufnehmen", points: ["Holz gibt ab, Wasser nimmt auf", "Falle: Was wärmer wird, nimmt Energie auf"] },
+              { t: 235, title: "Energietransportdiagramm und Energieträger", points: ["Kästchen – Pfeil „Energie geht über“ – Kästchen", "Extra: Cola und Eiswürfel · Öl, Gas, Kohle als Energieträger"] },
+              { t: 356, title: "Überführen statt umwandeln", points: ["Warum das Buch „überführen“ sagt"], note: "„Umwandeln“ ist nicht falsch – das Buch sagt nur „überführen“. Von Punktabzug weiß niemand etwas." },
+              { t: 424, title: "Mechanische Energie: Bewegung, Höhe, Spannung", points: ["ICE, Kran (Höhenenergie, nicht Lageenergie), Bogen", "Extra: Warum Hantel-Halten anstrengt"], note: "Spannenergie heißt im Buch E_S (im Podcast „Esp“)." },
+              { t: 617, title: "Innere Energie, elektrische und Strahlungsenergie", points: ["Thermisch, chemisch UND Kernenergie = innere Energie"] },
+              { t: 705, title: "Quiz: Batterie- und Dynamo-Taschenlampe", points: ["Energieketten bis zum Licht"] },
+              { t: 784, title: "Die Sonne als Energiequelle", points: ["Kohle = 300 Millionen Jahre alter Sonnenschein"] },
+              { t: 877, title: "Joule: Schokolade und 1-Liter-Falle", points: ["1 J ≈ 100 g Schokolade 1 m hoch", "1 Liter Wasser 1 m hoch = 10 J"] },
+              { t: 989, title: "Leistung: Treppe und Watt", points: ["Gleiche Energie, kürzere Zeit = mehr Leistung", "P = ΔE/Δt, 1 W = 1 J pro Sekunde"] },
+              { t: 1105, title: "Energiesklaven", points: ["Waschmaschine ≈ 7 Menschen, Haushalt ≈ 60"], note: "Im Buch: „ein Mensch“ schafft ca. 80 W – nicht ein Profi-Radsportler." },
+              { t: 1180, title: "Energieerhaltung: Wasserrutsche und Pendel", points: ["Höhen- ↔ Bewegungsenergie, beide gleichzeitig möglich", "Pendel wird langsamer: Reibung → thermische Energie"], note: "Auf halber Höhe hat man halb so viel Bewegungsenergie – nicht halb so viel Geschwindigkeit." },
+              { t: 1331, title: "Energieentwertung: Bremsen, Pyramide, ICE", points: ["Wertigkeit der Energie (Pyramide)", "ICE bremst mit Generatoren und speist ins Netz zurück"] },
+              { t: 1440, title: "Quiz: Der ruhende Gummiball", points: ["Hat er noch Energie? Ja – innere Energie"] },
+              { t: 1491, title: "Fallen-Check für die Arbeit", points: ["überführen · Höhenenergie · Kernenergie · wärmer = aufnehmen · 1 Liter = 10 J"] },
+              { t: 1570, title: "Richtung von Vorgängen", points: ["Warum ein Ball nie von selbst hochspringt"] }
+            ] }
+        ],
+        refs: {
+          s6:        { toc: 1, p: 6,  page: "S. 6–7", where: "„Wir erhitzen Wasser“ und Bild B2 (Energietransportdiagramm)", topic: "Energie aufnehmen und abgeben" },
+          s6trag:    { toc: 2, p: 6.5,page: "S. 6",   where: "Abschnitt „Ohne Energie geht es nicht“", topic: "Energieträger" },
+          s8:        { toc: 3, p: 8,  page: "S. 8",   where: "„Energie tritt in verschiedenen Formen auf“ und roter Merksatz", topic: "Energieformen und Überführung" },
+          s8weitere: { toc: 5, p: 8.5,page: "S. 8",   where: "„Weitere Energieformen“ (Bogen, Solarzelle, Nahrung, Kerze)", topic: "Weitere Energieformen" },
+          s9:        { toc: 6, p: 9,  page: "S. 9",   where: "„Beispiel“ Taschenlampe mit Lösung", topic: "Energietransportdiagramme" },
+          s10:       { toc: 4, p: 10, page: "S. 10",  where: "Tabelle „Übersicht über die verschiedenen Energieformen“ und Bemerkungen 1 und 2 am Rand", topic: "Energieformen, mechanische und innere Energie" },
+          s10therm:  { toc: 5, p: 10.5,page: "S. 10", where: "Kasten „Thermische Energie“ (Dampfmaschine)", topic: "Thermische Energie" },
+          s12verg:   { toc: 8, p: 12, page: "S. 12",  where: "„Energie wird verglichen“ (Gewichtsstück und Lampe)", topic: "Energie vergleichen" },
+          s12joule:  { toc: 8, p: 12.3,page: "S. 12", where: "„Die Einheit für die Energie“ und roter Merksatz", topic: "Joule" },
+          s12leist:  { toc: 9, p: 12.6,page: "S. 12", where: "„Der Energiezähler“ und Bemerkung 1 am Rand", topic: "Leistung, Watt, kWh" },
+          s14:       { toc: 11, p: 14, page: "S. 14",  where: "Exkurs „Energie beim Menschen“, Absatz „Irgendwann kannst du nicht mehr …“", topic: "Energie lässt sich nicht erzeugen" },
+          s16pendel: { toc: 11, p: 16, page: "S. 16",  where: "„Energie geht nicht verloren“ (Pendel) und Bild B1", topic: "Höhen- und Bewegungsenergie beim Pendel" },
+          s16merk:   { toc: 11, p: 16.5,page: "S. 16", where: "rechte Spalte, Bild B2 und roter Merksatz", topic: "Prinzip der Energieerhaltung" },
+          s18:       { toc: 12, p: 18, page: "S. 18",  where: "Einstieg (Bremsen) und „Die Energienutzung hat Grenzen“", topic: "Bremsen: Energie wird thermisch" },
+          s18peltier:{ p: 18.2,page: "S. 18", where: "Absatz über das Peltier-Element", topic: "Thermische in elektrische Energie" },
+          s18wert:   { toc: 12, p: 18.4,page: "S. 18", where: "„Der Wert von Energie“, Bild B1 (Pyramide) und roter Merksatz", topic: "Energieentwertung" },
+          s18richt:  { toc: 15, p: 18.6,page: "S. 18", where: "„Die Richtung von Vorgängen“", topic: "Vorgänge laufen nur in eine Richtung von allein ab" },
+          s19:       { toc: 13, p: 19, page: "S. 19",  where: "„Beispiel“ Gummiball mit Lösung", topic: "Gummiball: Energie wird entwertet" }
+        },
+        sets: [
+          {
+            id: "phy-k1-s21",
+            title: "Teste dich selbst (S. 21)",
+            desc: "Die Aufgaben aus dem Buch – in eigenen Worten.",
+            questions: [
+              { id:"a1", type:"tf", section:"Fachwissen", prompt:"Ein Gegenstand, der wärmer wird, gibt dabei Energie ab.", answer:false, explain:"Falsch. Was wärmer wird, nimmt Energie auf (das Wasser im Topf). Das brennende Holz gibt Energie ab.", refs:["s6"] },
+              { id:"a2", type:"tf", section:"Fachwissen", prompt:"Ein Gegenstand, der sich bewegt, hat Bewegungsenergie.", answer:true, explain:"Wahr. Bewegte Gegenstände haben Bewegungsenergie E_B.", refs:["s8"] },
+              { id:"a3", type:"tf", section:"Fachwissen", prompt:"Energie kann von einer Energieform in eine andere überführt werden.", answer:true, explain:"Wahr. Z. B. im Dynamo: Bewegungsenergie → elektrische Energie.", refs:["s8"] },
+              { id:"a4", type:"tf", section:"Fachwissen", prompt:"Ein Gegenstand hat immer nur Energie in einer einzigen Form.", answer:false, explain:"Falsch. Die Pendelkugel hat z. B. zwischen höchstem und tiefstem Punkt Höhen- UND Bewegungsenergie.", refs:["s16pendel"] },
+              { id:"a5", type:"tf", section:"Fachwissen", prompt:"Mit 1 J Energie kann man 1 Liter Wasser einen Meter hochheben.", answer:false, explain:"Falsch. 1 J reicht für 100 g (eine Tafel Schokolade) einen Meter hoch. 1 Liter Wasser wiegt 1 kg – dafür braucht man etwa 10 J.", refs:["s12joule"] },
+              { id:"a6", type:"tf", section:"Fachwissen", prompt:"Bei jeder Energieüberführung trägt ein Teil der Energie zur Erwärmung der Umgebung bei.", answer:true, explain:"Wahr. Roter Merksatz S. 16.", refs:["s16merk"] },
+              { id:"a7", type:"tf", section:"Fachwissen", prompt:"Energie kann man nicht erzeugen.", answer:true, explain:"Wahr. Energie lässt sich nur überführen, nicht erzeugen – deshalb musst du sie z. B. über die Nahrung aufnehmen.", refs:["s14"] },
+              { id:"a8", type:"tf", section:"Fachwissen", prompt:"Energie geht nicht verloren.", answer:true, explain:"Wahr. Prinzip der Energieerhaltung.", refs:["s16merk"] },
+              { id:"a9", type:"tf", section:"Fachwissen", prompt:"Thermische Energie lässt sich nicht in andere Energieformen überführen.", answer:false, explain:"Falsch. Es geht eingeschränkt: Dampfmaschine (→ Bewegungsenergie), Peltier-Element (→ elektrische Energie).", refs:["s10therm","s18peltier"] },
+
+              { id:"b1", type:"tf", section:"Gummiball", context:"Ein Gummiball hüpft mehrmals hintereinander, immer weniger hoch, bis er liegen bleibt.", prompt:"Höhenenergie, Bewegungsenergie und Spannenergie des Balls lassen sich ineinander überführen.", answer:true, explain:"Wahr. Fallen: Höhen- → Bewegungsenergie. Aufprall: Ball wird zusammengedrückt (Spannenergie). Hochspringen: zurück in Bewegungs- und Höhenenergie.", refs:["s10","s16pendel"] },
+              { id:"b2", type:"tf", section:"Gummiball", context:"Ein Gummiball hüpft mehrmals hintereinander, immer weniger hoch, bis er liegen bleibt.", prompt:"Die Höhenenergie des Balls (am höchsten Punkt jedes Sprungs) nimmt ab.", answer:true, explain:"Wahr. Er springt jedes Mal weniger hoch, also hat er oben weniger Höhenenergie.", refs:["s19"] },
+              { id:"b3", type:"tf", section:"Gummiball", context:"Ein Gummiball hüpft mehrmals hintereinander, immer weniger hoch, bis er liegen bleibt.", prompt:"Die Gesamtenergie des Balls bleibt erhalten.", answer:false, explain:"Falsch. Bei jedem Aufprall wird ein Teil in thermische Energie von Ball UND Boden/Luft überführt. Erhalten bleibt nur die Gesamtenergie von Ball und Umgebung zusammen.", refs:["s19","s16merk"] },
+              { id:"b4", type:"tf", section:"Gummiball", context:"Ein Gummiball hüpft mehrmals hintereinander, immer weniger hoch, bis er liegen bleibt.", prompt:"Liegt der Ball still, hat er keine Höhenenergie und keine Bewegungsenergie mehr.", answer:true, explain:"Wahr. Er liegt unten (keine Höhe mehr gegenüber dem Boden) und bewegt sich nicht.", refs:["s18richt"] },
+              { id:"b5", type:"tf", section:"Gummiball", context:"Ein Gummiball hüpft mehrmals hintereinander, immer weniger hoch, bis er liegen bleibt.", prompt:"Liegt der Ball still, hat er überhaupt keine Energie mehr.", answer:false, explain:"Falsch. Er hat weiterhin innere Energie (z. B. thermische Energie).", refs:["s10"] },
+
+              { id:"c1", type:"text", section:"Rätsel", prompt:"Vorrichtung, die Bewegungsenergie in thermische Energie überführt (z. B. am Auto).", answer:["bremse","bremsen","bremsscheibe","bremsscheiben","scheibenbremse"], explain:"Bremse (Bremsscheibe).", refs:["s18"] },
+              { id:"c2", type:"text", section:"Rätsel", prompt:"Energieform, die man mit einer Feder speichern kann.", answer:["spannenergie"], explain:"Spannenergie.", refs:["s10"] },
+              { id:"c3", type:"text", section:"Rätsel", prompt:"Die Einheit der Leistung.", answer:["watt","w"], explain:"Watt (W).", refs:["s12leist"] },
+              { id:"c4", type:"text", section:"Rätsel", prompt:"Begriff dafür, dass bei jedem Vorgang ein Teil der Energie in thermische Energie überführt wird.", answer:["energieentwertung","entwertung"], explain:"Energieentwertung.", refs:["s18wert"] },
+              { id:"c5", type:"text", section:"Rätsel", prompt:"Ein Gerät, das elektrische Energie in Strahlungsenergie überführt (kurzes Wort).", answer:["led","lampe","leuchte","gluehlampe","gluehbirne","ledlampe"], explain:"LED (oder Lampe).", refs:["s9"] },
+              { id:"c6", type:"text", section:"Rätsel", prompt:"Gerät, das je nach Bauart elektrische oder chemische Energie in Bewegungsenergie überführt.", answer:["motor","elektromotor","verbrennungsmotor"], explain:"Motor.", refs:["s8","s10"] },
+              { id:"c7", type:"text", section:"Rätsel", prompt:"Physikalische Größe, die die Energieänderung während einer bestimmten Zeitdauer angibt.", answer:["leistung"], explain:"Leistung (P = ΔE / Δt).", refs:["s12leist"] },
+              { id:"c8", type:"text", section:"Rätsel", prompt:"Die Einheit für die Energie.", answer:["joule","j"], explain:"Joule (J).", refs:["s12joule"] },
+              { id:"c9", type:"text", section:"Rätsel", prompt:"Lösungswort (8 Buchstaben): ein Gerät, das an seinen Anschlüssen elektrische Energie bereitstellt.", answer:["batterie"], explain:"Batterie.", refs:["s10"] },
+
+              { id:"d1", type:"tf", labels:["stimmt","stimmt nicht"], section:"Bewerten", context:"Pumpspeicher: Mit elektrischer Energie wird Wasser in einen höher gelegenen Stausee gepumpt (Höhenenergie). Später treibt das Wasser eine Turbine mit Generator an. Um möglichst viel Energie zu speichern, ist es wichtig, dass …", prompt:"… das Wasser eine möglichst hohe Temperatur hat.", answer:false, explain:"Stimmt nicht. Gespeichert wird Höhenenergie – die Temperatur spielt dafür keine Rolle.", refs:["s12verg","s18wert"] },
+              { id:"d2", type:"tf", labels:["stimmt","stimmt nicht"], section:"Bewerten", context:"Pumpspeicher: Mit elektrischer Energie wird Wasser in einen höher gelegenen Stausee gepumpt (Höhenenergie). Später treibt das Wasser eine Turbine mit Generator an. Um möglichst viel Energie zu speichern, ist es wichtig, dass …", prompt:"… das Speicherbecken groß ist.", answer:true, explain:"Stimmt. Mehr Wasser = mehr Höhenenergie (wie das schwerere Gewichtsstück auf S. 12).", refs:["s12verg"] },
+              { id:"d3", type:"tf", labels:["stimmt","stimmt nicht"], section:"Bewerten", context:"Pumpspeicher: Mit elektrischer Energie wird Wasser in einen höher gelegenen Stausee gepumpt (Höhenenergie). Später treibt das Wasser eine Turbine mit Generator an. Um möglichst viel Energie zu speichern, ist es wichtig, dass …", prompt:"… das Speicherbecken viel höher liegt als die Turbine.", answer:true, explain:"Stimmt. Größere Höhe = mehr Höhenenergie.", refs:["s12verg"] },
+              { id:"d4", type:"tf", labels:["stimmt","stimmt nicht"], section:"Bewerten", context:"Pumpspeicher: Mit elektrischer Energie wird Wasser in einen höher gelegenen Stausee gepumpt (Höhenenergie). Später treibt das Wasser eine Turbine mit Generator an. Um möglichst viel Energie zu speichern, ist es wichtig, dass …", prompt:"… die Rohrleitungen zur Turbine sehr lang sind.", answer:false, explain:"Stimmt nicht. Lange Leitungen bringen nichts – eher wird mehr Energie unterwegs entwertet.", refs:["s18wert"] }
+            ]
+          },
+          {
+            id: "phy-k1-extra",
+            title: "Zusatzfragen Kapitel 1",
+            desc: "17 weitere Fragen zu S. 6–19.",
+            questions: [
+              { id:"e2", type:"mc", prompt:"Ein gespannter Bogen beim Bogenschießen besitzt …", options:["Höhenenergie E_H","Spannenergie E_S","Strahlungsenergie E_Strahl","Kernenergie E_Kern"], answer:1, explain:"Spannenergie – wie ein gedehntes Gummiband oder eine Feder.", refs:["s10"] },
+              { id:"e3", type:"mc", prompt:"Ein hochgehobener Gegenstand hat …", options:["Bewegungsenergie E_B","Höhenenergie E_H","Thermische Energie E_therm","Elektrische Energie E_el"], answer:1, explain:"Höhenenergie E_H (im Buch nicht „Lageenergie“).", refs:["s10"] },
+              { id:"e4", type:"mc", prompt:"Was wandelt eine Solarzelle um?", options:["Strahlungsenergie → elektrische Energie","Elektrische Energie → Strahlungsenergie","Chemische Energie → elektrische Energie","Bewegungsenergie → thermische Energie"], answer:0, explain:"Licht (Strahlungsenergie) wird zu elektrischer Energie.", refs:["s8weitere"] },
+              { id:"e5", type:"mc", prompt:"Welches Energietransportdiagramm passt zur Dynamotaschenlampe?", options:["E_ch → Batterie → E_el → Lampe → E_Strahl","E_B → Dynamo → E_el → Lampe → E_Strahl","E_Strahl → Lampe → E_el → Dynamo → E_B","E_H → Lampe → E_B"], answer:1, explain:"Kurbeln (E_B) → Dynamo → E_el → Lampe → Licht.", refs:["s9"] },
+              { id:"e6", type:"mc", prompt:"Welche Energieformen fasst man unter „mechanische Energie“ zusammen?", options:["Thermische, chemische und Kernenergie","Höhen-, Bewegungs- und Spannenergie","Elektrische und Strahlungsenergie","Nur Bewegungsenergie"], answer:1, explain:"Höhen-, Bewegungs- und Spannenergie.", refs:["s10"] },
+              { id:"e7", type:"mc", prompt:"Welche Energieformen fasst man unter „innere Energie“ zusammen?", options:["Thermische, chemische und Kernenergie","Höhen-, Bewegungs- und Spannenergie","Elektrische und Strahlungsenergie","Spannenergie und Höhenenergie"], answer:0, explain:"Thermische, chemische und Kernenergie.", refs:["s10"] },
+              { id:"e8", type:"mc", prompt:"Wofür reicht ungefähr 1 Joule?", options:["1 Liter Wasser 1 m hochheben","Eine 100-g-Tafel Schokolade 1 m hochheben","1 Liter Wasser zum Kochen bringen","Eine Lampe einen Tag leuchten lassen"], answer:1, explain:"100 g einen Meter hoch.", refs:["s12joule"] },
+              { id:"e9", type:"mc", prompt:"Was gibt die Leistung P an?", options:["Wie viel Energie ein Gerät insgesamt hat","Wie viel Energie während einer bestimmten Zeitdauer übertragen wird","Wie schwer ein Gerät ist","Wie heiß ein Gerät wird"], answer:1, explain:"P = ΔE / Δt, Einheit Watt.", refs:["s12leist"] },
+              { id:"e10", type:"mc", prompt:"Wie viel Joule sind 1 kWh?", options:["1 000 J","3 600 J","3 600 000 J","60 000 J"], answer:2, explain:"1 Wh = 3600 J, also 1 kWh = 3 600 000 J.", refs:["s12leist"] },
+              { id:"e11", type:"mc", prompt:"Ein Gerät mit 500 W läuft 2 Stunden. Wie viel Energie wird übertragen?", options:["250 Wh","1 kWh","502 Wh","10 kWh"], answer:1, explain:"500 W · 2 h = 1000 Wh = 1 kWh.", refs:["s12leist"] },
+              { id:"e12", type:"mc", prompt:"Ein Fadenpendel schwingt. Wo hat die Kugel NUR Bewegungsenergie?", options:["Am höchsten Punkt","Am tiefsten Punkt","Auf halber Höhe","Überall gleich"], answer:1, explain:"Tiefster Punkt: am schnellsten, keine Höhe.", refs:["s16pendel"] },
+              { id:"e13", type:"mc", prompt:"Was sagt das Prinzip der Energieerhaltung?", options:["Bei einer Energieüberführung geht immer Energie verloren.","Berücksichtigt man die Erwärmung der Umwelt, kommt keine Energie hinzu und es geht keine verloren.","Energie kann man im Kraftwerk erzeugen.","Ein Gegenstand kann nur eine Energieform haben."], answer:1, explain:"Roter Merksatz S. 16.", refs:["s16merk"] },
+              { id:"e14", type:"mc", prompt:"Warum hört ein Pendel nach einiger Zeit auf zu schwingen?", options:["Die Energie verschwindet.","Ein Teil der Energie wird jedes Mal in thermische Energie der Umgebung überführt.","Die Höhenenergie wird größer.","Die Schwerkraft wird schwächer."], answer:1, explain:"Die Energie ist nicht weg, sie wärmt Pendel, Luft und Aufhängung.", refs:["s16merk"] },
+              { id:"e15", type:"mc", prompt:"Welche Energie hat den GERINGSTEN Wert?", options:["Elektrische Energie","Chemische Energie","Thermische Energie bei hoher Temperatur","Thermische Energie bei Umgebungstemperatur"], answer:3, explain:"Pyramide S. 18: ganz unten.", refs:["s18wert"] },
+              { id:"e16", type:"mc", prompt:"Warum springt ein liegender Ball nie von selbst hoch?", options:["Weil das gegen die Energieerhaltung wäre","Weil nicht alle Vorgänge, die nach der Energieerhaltung möglich wären, von allein ablaufen","Weil der Ball keine innere Energie hat","Weil der Boden zu hart ist"], answer:1, explain:"Vorgänge laufen nur in eine Richtung von allein ab.", refs:["s18richt"] },
+              { id:"e17", type:"mc", prompt:"Was ist beim Bremsen eines ICE anders als bei einem Auto mit Scheibenbremsen?", options:["Beim ICE wird alles in thermische Energie überführt.","Beim ICE arbeiten die Motoren als Generatoren und geben elektrische Energie ins Netz zurück.","Beim Auto wird Energie ins Netz zurückgegeben.","Es gibt keinen Unterschied."], answer:1, explain:"Der ICE gewinnt elektrische Energie zurück, das Auto erhitzt nur die Bremsen.", refs:["s18"] },
+              { id:"e18", type:"mc", prompt:"Öl und Gas zum Heizen nennt man …", options:["Energieträger","Energiewandler","Energieentwertung","Leistung"], answer:0, explain:"Energieträger (oft auch Energiequellen genannt).", refs:["s6trag"] }
+            ]
+          },
+          {
+ "id": "phy-k1-train",
+ "title": "Training (S. 22)",
+ "desc": "Aufgaben von der Trainingsseite – als Auswahlfragen.",
+ "questions": [
+  {
+   "id": "t1",
+   "type": "mc",
+   "prompt": "Wo wird Höhenenergie technisch genutzt?",
+   "options": [
+    "Wasserkraftwerk, Pumpspeicherkraftwerk, Pendeluhr mit Gewichten",
+    "Solarzelle, Kerze, Batterie",
+    "Föhn, Toaster, Herdplatte",
+    "Kühlschrank, Fernseher, Handy"
+   ],
+   "answer": 0,
+   "explain": "In allen drei Beispielen sinkt etwas herab (Wasser, Gewichtsstück) und gibt dabei Höhenenergie ab.",
+   "refs": [
+    "s12verg",
+    "s18wert"
+   ]
+  },
+  {
+   "id": "t2",
+   "type": "mc",
+   "prompt": "Warum besitzt eine gespannte Feder Energie?",
+   "options": [
+    "Weil sie schwer ist",
+    "Weil sie beim Entspannen etwas bewegen oder hochheben kann",
+    "Weil sie aus Metall ist",
+    "Weil sie warm ist"
+   ],
+   "answer": 1,
+   "explain": "Mit Energie kann man etwas bewegen oder hochheben. Eine gespannte Feder kann z. B. eine Kugel hochschießen – sie hat Spannenergie.",
+   "refs": [
+    "s10"
+   ]
+  },
+  {
+   "id": "t3",
+   "type": "mc",
+   "prompt": "Herr Sparfuchs sagt: „Nach der Energieerhaltung habe ich gar keine Energie verbraucht – ich zahle nicht.“ Was stimmt?",
+   "options": [
+    "Er hat recht, Energie geht nie verloren.",
+    "Die Energie ist zwar noch da, aber entwertet: Sie steckt als thermische Energie in der Umgebung und ist kaum noch nutzbar. Bezahlt wird die genutzte elektrische Energie.",
+    "Er hat recht, weil Strom kostenlos ist.",
+    "Energie wird im Haushalt erzeugt."
+   ],
+   "answer": 1,
+   "explain": "Energieerhaltung heißt nicht „nichts genutzt“. Die hochwertige elektrische Energie wurde genutzt und ist danach entwertet.",
+   "refs": [
+    "s16merk",
+    "s18wert"
+   ]
+  },
+  {
+   "id": "t4",
+   "type": "mc",
+   "prompt": "Rudi: „Einmal angeworfen treibt mein Motor einen Generator an, und der Generator liefert die Energie für Motor und Lampe – das läuft ewig.“ Bewerte.",
+   "options": [
+    "Funktioniert, wegen der Energieerhaltung.",
+    "Funktioniert nicht: Bei jeder Überführung wird ein Teil der Energie entwertet (Erwärmung). Die Vorrichtung bleibt stehen – erst recht, wenn noch eine Lampe Energie abgibt.",
+    "Funktioniert, wenn der Motor groß genug ist.",
+    "Funktioniert nur mit einer LED."
+   ],
+   "answer": 1,
+   "explain": "Ohne Energiezufuhr von außen bleibt jede Maschine stehen. So eine „ewige Maschine“ ist unmöglich.",
+   "refs": [
+    "s16merk",
+    "s18wert"
+   ]
+  },
+  {
+   "id": "t5",
+   "type": "mc",
+   "prompt": "Warum spart man mit einer LED-Lampe gegenüber einer Glühlampe gleicher Helligkeit?",
+   "options": [
+    "Die LED gibt mehr Wärme ab.",
+    "Die Glühlampe überführt einen großen Teil der elektrischen Energie in thermische Energie, die LED nur einen kleinen. Für gleich viel Licht braucht die LED weniger Energie.",
+    "Die LED braucht gar keine Energie.",
+    "Die Glühlampe leuchtet heller."
+   ],
+   "answer": 1,
+   "explain": "Im Energietransportdiagramm ist bei der Glühlampe der Pfeil für thermische Energie viel breiter.",
+   "refs": [
+    "s18wert"
+   ]
+  },
+  {
+   "id": "t6",
+   "type": "mc",
+   "prompt": "1 Liter Wasser von kalt auf 100 °C braucht etwa 350 kJ. Steinkohle hat 30 MJ pro kg. Wie viel Steinkohle braucht man ungefähr?",
+   "options": [
+    "Etwa 12 g",
+    "Etwa 1 kg",
+    "Etwa 120 g",
+    "Etwa 1 g"
+   ],
+   "answer": 0,
+   "explain": "30 MJ = 30 000 kJ pro 1000 g, also 30 kJ pro Gramm. 350 kJ : 30 kJ/g ≈ 12 g.",
+   "refs": [
+    "s12joule"
+   ]
+  }
+ ]
+}
+        ]
+      },
+      {
+ "id": "phy-k2",
+ "icon": "💡",
+ "title": "Kapitel 2: Elektrischer Strom",
+ "book": "Impulse Physik, S. 23–42",
+ "refs": {
+  "k24": {
+   "p": 24,
+   "page": "S. 24",
+   "where": "„Energie überall nutzen“ (Dampfmaschine, Generator, Kraftwerke)",
+   "topic": "Woher die elektrische Energie kommt"
+  },
+  "k24merk": {
+   "p": 24.5,
+   "page": "S. 24",
+   "where": "„Energie im Stromkreis“ und roter Merksatz",
+   "topic": "Energie im Stromkreis"
+  },
+  "k25": {
+   "p": 25,
+   "page": "S. 25",
+   "where": "„Beispiel“ Solarzelle und Elektromotor mit Lösung a) und b)",
+   "topic": "Energietransport ist nie vollständig"
+  },
+  "k27": {
+   "p": 27,
+   "page": "S. 27",
+   "where": "Methode „Beobachtungen im Stromkreis“ (Karten 1–3)",
+   "topic": "Stromkreis, Kupfer/Eisen, Batterien in Reihe, LED"
+  },
+  "k28": {
+   "p": 28,
+   "page": "S. 28",
+   "where": "„Elektrisch geladene Körper“ und „Es gibt zwei Sorten von Ladung“",
+   "topic": "Positive und negative Ladung"
+  },
+  "k28strom": {
+   "p": 28.5,
+   "page": "S. 28",
+   "where": "„Der elektrische Strom“, „Bewegliche Ladung in Metallen“ und roter Merksatz",
+   "topic": "Strom = bewegte Ladung, Elektronen"
+  },
+  "k30": {
+   "p": 30,
+   "page": "S. 30",
+   "where": "Exkurs „Blitze“",
+   "topic": "Blitze"
+  },
+  "k31": {
+   "p": 31,
+   "page": "S. 31",
+   "where": "Methode „Elektrische Energie und Elektronenbewegung“ (Fahrradkette)",
+   "topic": "Elektronen im Kreis, Energie zum Gerät"
+  },
+  "k32": {
+   "p": 32,
+   "page": "S. 32",
+   "where": "„Die Schülerstromstärke“ und „Die elektrische Stromstärke“",
+   "topic": "Stromstärke I in Ampere"
+  },
+  "k32mess": {
+   "p": 32.5,
+   "page": "S. 32",
+   "where": "„Die Messung der elektrischen Stromstärke“ und roter Merksatz",
+   "topic": "Amperemeter in Reihe, überall gleiche Stromstärke"
+  },
+  "k34": {
+   "p": 34,
+   "page": "S. 34",
+   "where": "Methode „Von der Beobachtung zur Messung“",
+   "topic": "Vergleichen, Messen, Grundgrößen"
+  },
+  "k35": {
+   "p": 35,
+   "page": "S. 35",
+   "where": "Methode „Der Umgang mit dem Multimeter“ (Messanleitung)",
+   "topic": "Multimeter richtig benutzen"
+  },
+  "k36": {
+   "p": 36,
+   "page": "S. 36",
+   "where": "„Kennzeichen elektrischer Quellen“ und Tabelle B2",
+   "topic": "Spannung U in Volt, Voltmeter parallel"
+  },
+  "k36teil": {
+   "p": 36.5,
+   "page": "S. 36–37",
+   "where": "„Teilspannungen“, Beispiel S. 37 und roter Merksatz",
+   "topic": "Teilspannungen"
+  },
+  "k38": {
+   "p": 38,
+   "page": "S. 38",
+   "where": "„Wovon hängt die Energie im Stromkreis ab?“, Formel ΔE = U·I·Δt und roter Merksatz",
+   "topic": "Energie, Spannung und Stromstärke"
+  },
+  "k39": {
+   "p": 39,
+   "page": "S. 39",
+   "where": "„Beispiel“ mit Lösung (182 J)",
+   "topic": "Energie berechnen"
+  },
+  "k40": {
+   "p": 40,
+   "page": "S. 40",
+   "where": "Rückblick, roter Warnkasten",
+   "topic": "Sicherheit"
+  }
+ },
+ "sets": [
+  {
+   "id": "phy-k2-s41",
+   "title": "Teste dich selbst (S. 41)",
+   "desc": "Die Aufgaben aus dem Buch – in eigenen Worten.",
+   "questions": [
+    {
+     "id": "a1",
+     "type": "tf",
+     "section": "Fachwissen",
+     "prompt": "Elektronen bewegen sich im Stromkreis von + nach −.",
+     "answer": false,
+     "explain": "Falsch. Elektronen bewegen sich vom Minuspol zum Pluspol.",
+     "refs": [
+      "k28strom",
+      "k31"
+     ]
+    },
+    {
+     "id": "a2",
+     "type": "tf",
+     "section": "Fachwissen",
+     "prompt": "Vor und hinter einer Lampe ist die elektrische Stromstärke gleich groß.",
+     "answer": true,
+     "explain": "Wahr. In einem einfachen Stromkreis ist die Stromstärke überall gleich groß.",
+     "refs": [
+      "k32mess"
+     ]
+    },
+    {
+     "id": "a3",
+     "type": "tf",
+     "section": "Fachwissen",
+     "prompt": "Energie wird im elektrischen Stromkreis immer im Kreis transportiert.",
+     "answer": false,
+     "explain": "Falsch. Die Elektronen bewegen sich im Kreis – die Energie wird von der Quelle zum Gerät transportiert.",
+     "refs": [
+      "k31",
+      "k24merk"
+     ]
+    },
+    {
+     "id": "a4",
+     "type": "tf",
+     "section": "Fachwissen",
+     "prompt": "Die Anzahl der Elektronen, die in einer Sekunde an einer Messstelle vorbeifließt, bestimmt die elektrische Stromstärke.",
+     "answer": true,
+     "explain": "Wahr. Stromstärke = Ladung pro Zeitdauer.",
+     "refs": [
+      "k32"
+     ]
+    },
+    {
+     "id": "a5",
+     "type": "tf",
+     "section": "Fachwissen",
+     "prompt": "Je größer die Spannung der Quelle ist, desto mehr Energie wird bei gleicher Stromstärke übertragen.",
+     "answer": true,
+     "explain": "Wahr. ΔE = U · I · Δt.",
+     "refs": [
+      "k38"
+     ]
+    },
+    {
+     "id": "a6",
+     "type": "tf",
+     "section": "Fachwissen",
+     "prompt": "Die Summe der Teilspannungen an mehreren Geräten eines Stromkreises ist immer größer als die Gesamtspannung.",
+     "answer": false,
+     "explain": "Falsch. Bei Geräten in Reihe ergeben die Teilspannungen zusammen die Spannung der Quelle – nicht mehr.",
+     "refs": [
+      "k36teil"
+     ]
+    },
+    {
+     "id": "b1",
+     "type": "tf",
+     "section": "Schaltplan",
+     "prompt": "Die Spannungen U₁, U₂ und U₃ sind gleich groß.",
+     "answer": false,
+     "explain": "Falsch. U₃ ist die Spannung der Quelle, U₁ und U₂ sind Teilspannungen. Zusammen ergeben U₁ und U₂ die Spannung U₃.",
+     "refs": [
+      "k36teil"
+     ],
+     "context": "Schaltplan S. 41: An der Quelle misst ein Voltmeter die Spannung U₃. Zwei Lampen L1 und L2 sind in Reihe geschaltet. Über L1 misst ein Voltmeter U₁, über L2 ein Voltmeter U₂. Ein Amperemeter misst I₁ vor L1, ein zweites I₂ nach L2. Eine Stoppuhr misst die Zeit."
+    },
+    {
+     "id": "b2",
+     "type": "tf",
+     "section": "Schaltplan",
+     "prompt": "U₁ ist kleiner als U₃.",
+     "answer": true,
+     "explain": "Wahr. U₁ ist nur eine Teilspannung.",
+     "refs": [
+      "k36teil"
+     ],
+     "context": "Schaltplan S. 41: An der Quelle misst ein Voltmeter die Spannung U₃. Zwei Lampen L1 und L2 sind in Reihe geschaltet. Über L1 misst ein Voltmeter U₁, über L2 ein Voltmeter U₂. Ein Amperemeter misst I₁ vor L1, ein zweites I₂ nach L2. Eine Stoppuhr misst die Zeit."
+    },
+    {
+     "id": "b3",
+     "type": "tf",
+     "section": "Schaltplan",
+     "prompt": "I₂ ist kleiner als I₁.",
+     "answer": false,
+     "explain": "Falsch. Die Stromstärke ist im einfachen Stromkreis überall gleich – I₁ = I₂.",
+     "refs": [
+      "k32mess"
+     ],
+     "context": "Schaltplan S. 41: An der Quelle misst ein Voltmeter die Spannung U₃. Zwei Lampen L1 und L2 sind in Reihe geschaltet. Über L1 misst ein Voltmeter U₁, über L2 ein Voltmeter U₂. Ein Amperemeter misst I₁ vor L1, ein zweites I₂ nach L2. Eine Stoppuhr misst die Zeit."
+    },
+    {
+     "id": "b4",
+     "type": "tf",
+     "section": "Schaltplan",
+     "prompt": "Die zu Lampe 1 übertragene Energie könnte man mit den Messwerten berechnen.",
+     "answer": true,
+     "explain": "Wahr. ΔE = U₁ · I₁ · Δt – alle drei Werte werden gemessen (die Zeit mit der Stoppuhr).",
+     "refs": [
+      "k38",
+      "k39"
+     ],
+     "context": "Schaltplan S. 41: An der Quelle misst ein Voltmeter die Spannung U₃. Zwei Lampen L1 und L2 sind in Reihe geschaltet. Über L1 misst ein Voltmeter U₁, über L2 ein Voltmeter U₂. Ein Amperemeter misst I₁ vor L1, ein zweites I₂ nach L2. Eine Stoppuhr misst die Zeit."
+    },
+    {
+     "id": "b5",
+     "type": "tf",
+     "section": "Schaltplan",
+     "prompt": "Am Minuspol verlassen gleich viele Elektronen die Quelle, wie am Pluspol zurückkommen.",
+     "answer": true,
+     "explain": "Wahr. Die Elektronen werden nicht verbraucht, sie bewegen sich im Kreis.",
+     "refs": [
+      "k31",
+      "k28strom"
+     ],
+     "context": "Schaltplan S. 41: An der Quelle misst ein Voltmeter die Spannung U₃. Zwei Lampen L1 und L2 sind in Reihe geschaltet. Über L1 misst ein Voltmeter U₁, über L2 ein Voltmeter U₂. Ein Amperemeter misst I₁ vor L1, ein zweites I₂ nach L2. Eine Stoppuhr misst die Zeit."
+    },
+    {
+     "id": "c1",
+     "type": "text",
+     "section": "Rätsel",
+     "prompt": "Wird auf einen Körper übertragen, wenn er mit einem Pol einer elektrischen Quelle verbunden wird.",
+     "answer": [
+      "ladung",
+      "elektrischeladung"
+     ],
+     "explain": "Ladung.",
+     "refs": [
+      "k28"
+     ]
+    },
+    {
+     "id": "c2",
+     "type": "text",
+     "section": "Rätsel",
+     "prompt": "Gibt an, wie viel Ladung pro Sekunde durch einen Leiter transportiert wird.",
+     "answer": [
+      "stromstaerke",
+      "elektrischestromstaerke"
+     ],
+     "explain": "Stromstärke.",
+     "refs": [
+      "k32"
+     ]
+    },
+    {
+     "id": "c3",
+     "type": "text",
+     "section": "Rätsel",
+     "prompt": "Kennzeichen einer elektrischen Quelle.",
+     "answer": [
+      "spannung",
+      "elektrischespannung",
+      "nennspannung"
+     ],
+     "explain": "Spannung.",
+     "refs": [
+      "k36"
+     ]
+    },
+    {
+     "id": "c4",
+     "type": "text",
+     "section": "Rätsel",
+     "prompt": "Träger negativer Ladung.",
+     "answer": [
+      "elektron",
+      "elektronen"
+     ],
+     "explain": "Elektronen.",
+     "refs": [
+      "k28strom"
+     ]
+    },
+    {
+     "id": "c5",
+     "type": "text",
+     "section": "Rätsel",
+     "prompt": "Wird in Stromkreisen von der Quelle zum Gerät transportiert.",
+     "answer": [
+      "energie",
+      "elektrischeenergie"
+     ],
+     "explain": "Energie.",
+     "refs": [
+      "k24merk",
+      "k31"
+     ]
+    },
+    {
+     "id": "c6",
+     "type": "text",
+     "section": "Rätsel",
+     "prompt": "Ein Körper, der gleich viel positive und negative Ladung trägt, ist …",
+     "answer": [
+      "neutral",
+      "elektrischneutral"
+     ],
+     "explain": "Elektrisch neutral.",
+     "refs": [
+      "k28"
+     ]
+    },
+    {
+     "id": "c7",
+     "type": "text",
+     "section": "Rätsel",
+     "prompt": "Lösungswort (6 Buchstaben): der Name der Einheit einer physikalischen Grundgröße.",
+     "answer": [
+      "ampere"
+     ],
+     "explain": "Ampere (Einheit der Stromstärke).",
+     "refs": [
+      "k32",
+      "k34"
+     ]
+    },
+    {
+     "id": "d1",
+     "type": "tf",
+     "section": "Bewerten",
+     "prompt": "Jemand rechnet: E = 3 V · 100 mA · 30 s = 9000 J. Ist das richtig?",
+     "answer": false,
+     "explain": "Falsch. 100 mA sind 0,1 A. Richtig: 3 V · 0,1 A · 30 s = 9 J.",
+     "refs": [
+      "k38",
+      "k39"
+     ],
+     "labels": [
+      "richtig",
+      "falsch"
+     ]
+    },
+    {
+     "id": "d2",
+     "type": "tf",
+     "section": "Bewerten",
+     "prompt": "Motor, Lampe und LED sind in Reihe. Am Motor werden 5 V gemessen. Jemand folgert: Die Gesamtspannung ist 3 · 5 V = 15 V. Ist das richtig?",
+     "answer": false,
+     "explain": "Falsch. Verschiedene Geräte haben verschiedene Teilspannungen. Man darf nicht einfach die Spannung am Motor mal drei nehmen.",
+     "refs": [
+      "k36teil"
+     ],
+     "labels": [
+      "richtig",
+      "falsch"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "phy-k2-extra",
+   "title": "Zusatzfragen Kapitel 2",
+   "desc": "Weitere Fragen zu S. 24–42.",
+   "questions": [
+    {
+     "id": "e1",
+     "type": "mc",
+     "prompt": "Was macht ein Generator?",
+     "options": [
+      "Er überführt Bewegungsenergie in elektrische Energie.",
+      "Er überführt elektrische Energie in Licht.",
+      "Er speichert Ladung.",
+      "Er misst die Stromstärke."
+     ],
+     "answer": 0,
+     "explain": "Generatoren (z. B. im Kraftwerk oder als Dynamo) überführen Bewegungsenergie in elektrische Energie.",
+     "refs": [
+      "k24"
+     ]
+    },
+    {
+     "id": "e2",
+     "type": "mc",
+     "prompt": "Wo steht elektrische Energie zur Verfügung?",
+     "options": [
+      "Im Kabel, auch ohne Quelle",
+      "An den Anschlüssen einer elektrischen Quelle",
+      "Nur in der Lampe",
+      "Nur im Kraftwerk"
+     ],
+     "answer": 1,
+     "explain": "Roter Merksatz S. 24.",
+     "refs": [
+      "k24merk"
+     ]
+    },
+    {
+     "id": "e3",
+     "type": "mc",
+     "prompt": "Eine Solarzelle treibt einen Motor an. Warum kommt nicht die ganze Energie beim Motor an?",
+     "options": [
+      "Weil Elektronen verloren gehen",
+      "Weil sich Solarzelle, Leitungen und Motor erwärmen und Energie an die Umwelt abgeben",
+      "Weil Licht keine Energie hat",
+      "Weil der Motor zu groß ist"
+     ],
+     "answer": 1,
+     "explain": "Energieüberführung geschieht nie vollständig. Ein Teil geht immer in die Umwelt.",
+     "refs": [
+      "k25",
+      "k31"
+     ]
+    },
+    {
+     "id": "e4",
+     "type": "mc",
+     "prompt": "Mit einem Eisendraht statt Kupferdraht leuchtet die Lampe schwächer. Wie kann man das ausgleichen?",
+     "options": [
+      "Mit einem längeren Eisendraht",
+      "Mit einer höheren Spannung (z. B. zweite Batterie in Reihe)",
+      "Indem man die Lampe umdreht",
+      "Gar nicht"
+     ],
+     "answer": 1,
+     "explain": "Die Erhöhung der Spannung gleicht die schlechtere Leitung des Eisendrahts aus.",
+     "refs": [
+      "k27"
+     ]
+    },
+    {
+     "id": "e5",
+     "type": "mc",
+     "prompt": "Zwei Batterien mit je 1,5 V werden hintereinander (in Reihe) geschaltet. Welche Spannung haben sie zusammen?",
+     "options": [
+      "1,5 V",
+      "3 V",
+      "0,75 V",
+      "2,25 V"
+     ],
+     "answer": 1,
+     "explain": "In Reihe addieren sich die Nennspannungen: 1,5 V + 1,5 V = 3 V.",
+     "refs": [
+      "k27"
+     ]
+    },
+    {
+     "id": "e6",
+     "type": "mc",
+     "prompt": "Zwei gleichartig geladene Körper …",
+     "options": [
+      "ziehen sich an",
+      "stoßen sich ab",
+      "neutralisieren sich",
+      "werden warm"
+     ],
+     "answer": 1,
+     "explain": "Gleichartig geladen: abstoßen. Verschiedenartig geladen: anziehen.",
+     "refs": [
+      "k28"
+     ]
+    },
+    {
+     "id": "e7",
+     "type": "mc",
+     "prompt": "Was sind die beweglichen Ladungsträger in Metallen?",
+     "options": [
+      "Positive Atome",
+      "Elektronen – sie sind negativ geladen",
+      "Lichtteilchen",
+      "Luftteilchen"
+     ],
+     "answer": 1,
+     "explain": "Entdeckt von J. J. Thomson vor über 100 Jahren.",
+     "refs": [
+      "k28strom"
+     ]
+    },
+    {
+     "id": "e8",
+     "type": "mc",
+     "prompt": "Wie schnell bewegen sich die Elektronen ungefähr im Draht?",
+     "options": [
+      "Etwa 1 mm pro Sekunde",
+      "Mit Lichtgeschwindigkeit",
+      "Etwa 100 km/h",
+      "Gar nicht"
+     ],
+     "answer": 0,
+     "explain": "Sehr langsam: etwa 1 mm/s vom Minus- zum Pluspol.",
+     "refs": [
+      "k28strom"
+     ]
+    },
+    {
+     "id": "e9",
+     "type": "mc",
+     "prompt": "Warum leuchtet die Lampe trotzdem sofort beim Einschalten?",
+     "options": [
+      "Weil die Elektronen sehr schnell sind",
+      "Weil überall im Stromkreis schon Elektronen sind – wie bei einer Fahrradkette bewegen sich alle gleichzeitig",
+      "Weil die Lampe vorgeheizt ist",
+      "Weil die Energie im Kabel gespeichert ist"
+     ],
+     "answer": 1,
+     "explain": "Fahrradkette: Tritt man in die Pedale, bewegt sich das Hinterrad sofort.",
+     "refs": [
+      "k31",
+      "k38"
+     ]
+    },
+    {
+     "id": "e10",
+     "type": "mc",
+     "prompt": "90 Schüler gehen in 30 Sekunden durch eine Tür. Wie groß ist die „Schülerstromstärke“?",
+     "options": [
+      "3 Schüler pro Sekunde",
+      "30 Schüler pro Sekunde",
+      "120 Schüler",
+      "0,3 Schüler pro Sekunde"
+     ],
+     "answer": 0,
+     "explain": "90 : 30 s = 3 pro Sekunde.",
+     "refs": [
+      "k32"
+     ]
+    },
+    {
+     "id": "e11",
+     "type": "mc",
+     "prompt": "Formelzeichen und Einheit der elektrischen Stromstärke?",
+     "options": [
+      "U und Volt",
+      "I und Ampere",
+      "E und Joule",
+      "P und Watt"
+     ],
+     "answer": 1,
+     "explain": "I in Ampere (A). Messgeräte heißen Amperemeter.",
+     "refs": [
+      "k32"
+     ]
+    },
+    {
+     "id": "e12",
+     "type": "mc",
+     "prompt": "Wie wird ein Amperemeter angeschlossen?",
+     "options": [
+      "Parallel zur Lampe",
+      "In Reihe: Stromkreis unterbrechen und das Messgerät dazwischen schalten",
+      "Nur an den Pluspol",
+      "Neben die Batterie legen"
+     ],
+     "answer": 1,
+     "explain": "Der Strom muss durch das Messgerät fließen.",
+     "refs": [
+      "k32mess"
+     ]
+    },
+    {
+     "id": "e13",
+     "type": "mc",
+     "prompt": "Welchen Messbereich stellt man am Multimeter zuerst ein?",
+     "options": [
+      "Den kleinsten",
+      "Den größten – dann so weit verkleinern, dass noch eine ablesbare Anzeige erscheint",
+      "Egal",
+      "Immer 20 A"
+     ],
+     "answer": 1,
+     "explain": "Messanleitung S. 35. Vor jedem Eingriff die Schaltung von der Quelle trennen!",
+     "refs": [
+      "k35"
+     ]
+    },
+    {
+     "id": "e14",
+     "type": "mc",
+     "prompt": "Zwei Lampen sind parallel geschaltet. Leitung A führt zu beiden Lampen, B und C jeweils zu einer. Was gilt für die Stromstärke?",
+     "options": [
+      "In A ist sie doppelt so groß wie in B bzw. C.",
+      "In A ist sie halb so groß.",
+      "Überall gleich.",
+      "In A ist sie null."
+     ],
+     "answer": 0,
+     "explain": "A versorgt beide Lampen, also fließt dort doppelt so viel.",
+     "refs": [
+      "k34"
+     ]
+    },
+    {
+     "id": "e15",
+     "type": "mc",
+     "prompt": "Formelzeichen und Einheit der elektrischen Spannung?",
+     "options": [
+      "U und Volt",
+      "I und Ampere",
+      "E und Joule",
+      "V und Watt"
+     ],
+     "answer": 0,
+     "explain": "U in Volt (V). 1 kV = 1000 V, 1 mV = 0,001 V.",
+     "refs": [
+      "k36"
+     ]
+    },
+    {
+     "id": "e16",
+     "type": "mc",
+     "prompt": "Wie wird ein Voltmeter angeschlossen?",
+     "options": [
+      "In Reihe",
+      "Parallel – an beide Anschlüsse von Quelle oder Gerät",
+      "Nur an den Minuspol",
+      "Gar nicht"
+     ],
+     "answer": 1,
+     "explain": "Parallel, dabei Plus an Plus und Minus an Minus.",
+     "refs": [
+      "k36"
+     ]
+    },
+    {
+     "id": "e17",
+     "type": "mc",
+     "prompt": "Welche Spannung hat die Steckdose?",
+     "options": [
+      "1,5 V",
+      "12 V",
+      "230 V",
+      "15 kV"
+     ],
+     "answer": 2,
+     "explain": "Mignonzelle 1,5 V · Autobatterie 12 V · Steckdose 230 V · Bahn-Fahrdraht 15 kV.",
+     "refs": [
+      "k36"
+     ]
+    },
+    {
+     "id": "e18",
+     "type": "mc",
+     "prompt": "Zwei gleiche Lampen sind in Reihe an 6 V angeschlossen. Wie groß ist die Teilspannung an jeder Lampe?",
+     "options": [
+      "6 V",
+      "3 V",
+      "12 V",
+      "1,5 V"
+     ],
+     "answer": 1,
+     "explain": "Die Teilspannungen ergeben zusammen 6 V, bei gleichen Lampen je 3 V.",
+     "refs": [
+      "k36teil"
+     ]
+    },
+    {
+     "id": "e19",
+     "type": "mc",
+     "prompt": "Mit welcher Formel berechnet man die übertragene elektrische Energie?",
+     "options": [
+      "ΔE = U + I + Δt",
+      "ΔE = U · I · Δt",
+      "ΔE = U : I",
+      "ΔE = I · Δt"
+     ],
+     "answer": 1,
+     "explain": "Spannung mal Stromstärke mal Zeit.",
+     "refs": [
+      "k38"
+     ]
+    },
+    {
+     "id": "e20",
+     "type": "mc",
+     "prompt": "Eine Lampe: 5,0 V, 0,364 A, 100 s. Wie viel Energie wird übertragen?",
+     "options": [
+      "182 J",
+      "18,2 J",
+      "1820 J",
+      "36,4 J"
+     ],
+     "answer": 0,
+     "explain": "5,0 V · 0,364 A · 100 s = 182 J.",
+     "refs": [
+      "k39"
+     ]
+    },
+    {
+     "id": "e21",
+     "type": "mc",
+     "prompt": "Bei gleicher Stromstärke wird die Spannung verdoppelt. Was passiert mit der übertragenen Energie (gleiche Zeit)?",
+     "options": [
+      "Sie halbiert sich.",
+      "Sie verdoppelt sich.",
+      "Sie bleibt gleich.",
+      "Sie vervierfacht sich."
+     ],
+     "answer": 1,
+     "explain": "ΔE = U · I · Δt – doppelte Spannung, doppelte Energie. Die Spannung gibt an, wie viel Energie pro Elektron transportiert wird.",
+     "refs": [
+      "k38"
+     ]
+    },
+    {
+     "id": "e24",
+     "type": "mc",
+     "prompt": "Ab welcher Spannung besteht bei Berührung Lebensgefahr?",
+     "options": [
+      "Ab 1,5 V",
+      "Über 50 V",
+      "Erst ab 1000 V",
+      "Nie"
+     ],
+     "answer": 1,
+     "explain": "Deshalb: Niemals mit Strom aus der Steckdose experimentieren!",
+     "refs": [
+      "k40"
+     ]
+    },
+    {
+     "id": "e25",
+     "type": "mc",
+     "prompt": "Wer bewies 1752, dass Blitze elektrische Entladungen sind?",
+     "options": [
+      "James Watt",
+      "Benjamin Franklin",
+      "J. J. Thomson",
+      "Werner von Siemens"
+     ],
+     "answer": 1,
+     "explain": "Mit einem Drachen an einem Draht. Achtung: Niemals bei Gewitter Drachen steigen lassen!",
+     "refs": [
+      "k30"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "phy-k2-train",
+   "title": "Training (S. 42)",
+   "desc": "Aufgaben von der Trainingsseite – als Auswahlfragen.",
+   "questions": [
+    {
+     "id": "t1",
+     "type": "mc",
+     "prompt": "Wozu dient der Kunststoff, mit dem Kabel ummantelt sind?",
+     "options": [
+      "Er macht das Kabel schöner.",
+      "Er isoliert: Kunststoff leitet nicht, so kann man das Kabel gefahrlos anfassen.",
+      "Er leitet den Strom besser.",
+      "Er speichert Energie."
+     ],
+     "answer": 1,
+     "explain": "Kunststoff ist ein Isolator. Die Ummantelung schützt vor Berührung der leitenden Drähte.",
+     "refs": [
+      "k40"
+     ]
+    },
+    {
+     "id": "t2",
+     "type": "mc",
+     "prompt": "Warum haben Überlandleitungen keine Kunststoff-Ummantelung?",
+     "options": [
+      "Weil dort kein Strom fließt",
+      "Weil sie hoch hängen und die Luft dazwischen isoliert – niemand kommt an sie heran",
+      "Weil Kunststoff zu teuer ist",
+      "Weil die Spannung dort klein ist"
+     ],
+     "answer": 1,
+     "explain": "Die Leitungen hängen in großer Höhe mit Abstand zueinander. Die Luft isoliert. (Die Spannung ist dort sehr hoch: 230–380 kV.)",
+     "refs": [
+      "k36",
+      "k40"
+     ]
+    },
+    {
+     "id": "t3",
+     "type": "mc",
+     "prompt": "Welche Wirkung des elektrischen Stromes nutzt vor allem ein Backofen?",
+     "options": [
+      "Die Lichtwirkung",
+      "Die Wärmewirkung",
+      "Die magnetische Wirkung",
+      "Gar keine"
+     ],
+     "answer": 1,
+     "explain": "Backofen: Wärme. Lampe: Licht (und Wärme). Föhn: Wärme und Bewegung durch den Motor. Bohrmaschine: Bewegung durch den Elektromotor (magnetische Wirkung).",
+     "refs": [
+      "k32"
+     ]
+    },
+    {
+     "id": "t4",
+     "type": "mc",
+     "prompt": "Warum ist die Aussage „In einer elektrischen Quelle ist Strom drin“ falsch?",
+     "options": [
+      "Weil Batterien leer sind",
+      "Weil die Elektronen schon überall im Leiter sind. Die Quelle trennt Ladung und stellt Energie bereit – Strom entsteht erst, wenn sich Ladung im geschlossenen Kreis bewegt.",
+      "Weil Strom nur aus der Steckdose kommt",
+      "Weil Batterien Licht enthalten"
+     ],
+     "answer": 1,
+     "explain": "Strom ist bewegte Ladung, kein Stoff, der in der Batterie lagert.",
+     "refs": [
+      "k28strom",
+      "k31"
+     ]
+    },
+    {
+     "id": "t5",
+     "type": "mc",
+     "prompt": "Auf einem Gerät steht „12 V, max. 3 A“. Wie überprüfst du das im Experiment?",
+     "options": [
+      "Gerät an eine 12-V-Quelle anschließen, ein Amperemeter in Reihe und ein Voltmeter parallel zum Gerät schalten und ablesen",
+      "Das Gerät wiegen",
+      "Zwei Voltmeter in Reihe schalten",
+      "Das Gerät an die Steckdose anschließen"
+     ],
+     "answer": 0,
+     "explain": "Spannung wird parallel gemessen, Stromstärke in Reihe. Die gemessene Stromstärke darf höchstens 3 A betragen.",
+     "refs": [
+      "k32mess",
+      "k36"
+     ]
+    },
+    {
+     "id": "t6",
+     "type": "mc",
+     "prompt": "Ein Wasserkocher trägt die Aufschrift „230 V, max. 10 A“. Wie viel Energie überführt er in 1 Sekunde?",
+     "options": [
+      "240 J",
+      "2300 J",
+      "23 J",
+      "23 000 J"
+     ],
+     "answer": 1,
+     "explain": "ΔE = U · I · Δt = 230 V · 10 A · 1 s = 2300 J.",
+     "refs": [
+      "k38"
+     ]
+    },
+    {
+     "id": "t7",
+     "type": "mc",
+     "prompt": "Um 1 Liter Wasser um 1 °C zu erwärmen, braucht man 4,2 kJ. Wie lange braucht der Wasserkocher (2300 J pro Sekunde) ungefähr von 20 °C bis 100 °C?",
+     "options": [
+      "Etwa 15 Sekunden",
+      "Etwa 2,5 Minuten",
+      "Etwa 25 Minuten",
+      "Etwa 1 Stunde"
+     ],
+     "answer": 1,
+     "explain": "80 °C · 4,2 kJ = 336 kJ = 336 000 J. 336 000 J : 2300 J pro s ≈ 146 s ≈ 2,5 min.",
+     "refs": [
+      "k38"
+     ]
+    },
+    {
+     "id": "t8",
+     "type": "mc",
+     "prompt": "Vier Batterien mit je 1,5 V: Drei sind nebeneinander (parallel) geschaltet, die vierte hintereinander (in Reihe) dazu. Welche Spannung liegt zwischen A und B?",
+     "options": [
+      "6 V",
+      "3 V",
+      "4,5 V",
+      "1,5 V"
+     ],
+     "answer": 1,
+     "explain": "Parallel geschaltete gleiche Batterien haben zusammen weiter 1,5 V. Dazu kommt die vierte in Reihe: 1,5 V + 1,5 V = 3 V. Das gilt für beide Schaltungen der Aufgabe.",
+     "refs": [
+      "k27"
+     ]
+    },
+    {
+     "id": "t9",
+     "type": "mc",
+     "prompt": "Du hast zwei Batterien mit je 1,5 V und eine mit 9,0 V. Welche Spannung kannst du durch Hintereinanderschalten NICHT erzeugen?",
+     "options": [
+      "10,5 V",
+      "12 V",
+      "4,5 V",
+      "3 V"
+     ],
+     "answer": 2,
+     "explain": "Möglich sind 1,5 V, 3 V, 9 V, 10,5 V und 12 V. Für 4,5 V bräuchtest du drei 1,5-V-Batterien.",
+     "refs": [
+      "k27"
+     ]
+    },
+    {
+     "id": "t10",
+     "type": "mc",
+     "prompt": "Warum soll man eine Kabeltrommel beim Anschluss starker Geräte ganz abrollen?",
+     "options": [
+      "Damit das Kabel länger hält",
+      "Weil sich die Leitungen erwärmen. Aufgerollt kann die Wärme nicht abgegeben werden – das Kabel kann überhitzen.",
+      "Weil sonst kein Strom fließt",
+      "Weil die Spannung sonst steigt"
+     ],
+     "answer": 1,
+     "explain": "Stromdurchflossene Leitungen werden warm und geben Energie an die Umwelt ab. Aufgewickelt staut sich die Wärme.",
+     "refs": [
+      "k25"
+     ]
+    }
+   ]
+  }
+ ]
+}
+    ]
+  }
+];
+
+/* =========================================================
+   SPEICHER
+   ========================================================= */
+const KEY = "lernapp.v1";
+let memoryStore = null;
+function loadStore(){
+  try{ const raw = localStorage.getItem(KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memoryStore || { pw:null, sets:{} };
+}
+function saveStore(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ memoryStore = S; }
+}
+let S = loadStore();
+let storageOK = true;
+try{ localStorage.setItem("lernapp.test","1"); localStorage.removeItem("lernapp.test"); }catch(e){ storageOK = false; }
+
+/* =========================================================
+   HILFSFUNKTIONEN
+   ========================================================= */
+const $app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const fmtSub = s => esc(s).replace(/E_([A-Za-zäöü]+)/g, "E<sub>$1</sub>");
+const norm = s => String(s||"").toLowerCase().trim()
+  .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")
+  .replace(/[^a-z0-9]/g,"");
+const shuffle = arr => { const a = arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const nowStr = () => new Date().toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+
+function findSet(setId){
+  for(const sub of SUBJECTS) for(const ch of sub.chapters) for(const st of ch.sets)
+    if(st.id===setId) return { sub, ch, set:st };
+  return null;
+}
+function qById(set, id){ return set.questions.find(q => q.id===id); }
+function setState(setId){
+  if(!S.sets[setId]) S.sets[setId] = { stage:"new", round:0, queue:[], idx:0, answers:{}, orders:{}, wrong:[], read:{}, history:[], approvals:[] };
+  return S.sets[setId];
+}
+
+async function hashPw(pw){
+  const salt = S.pw && S.pw.salt ? S.pw.salt : "";
+  const data = new TextEncoder().encode(salt + "::" + pw);
+  try{
+    const buf = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  }catch(e){
+    let h = 5381; for(const b of data){ h = ((h<<5)+h + b) >>> 0; } return "f" + h.toString(16);
+  }
+}
+
+/* ---------- Sprachausgabe ---------- */
+let VOICES = [];
+function loadVoices(){
+  try{ VOICES = window.speechSynthesis.getVoices().filter(v => /^de/i.test(v.lang)); }catch(e){ VOICES = []; }
+}
+try{ if("speechSynthesis" in window){ loadVoices(); window.speechSynthesis.onvoiceschanged = loadVoices; } }catch(e){}
+function voiceScore(v){
+  const n = (v.name + " " + v.voiceURI).toLowerCase();
+  let sc = 0;
+  if(/premium|enhanced|erweitert|neural|natural|wavenet|online/.test(n)) sc += 10;
+  if(/google/.test(n)) sc += 6;
+  if(/anna|helena|petra|markus|yannick|viktor|katja|conrad|amala|seraphina|florian/.test(n)) sc += 3;
+  if(v.lang === "de-DE" || v.lang === "de_DE") sc += 2;
+  if(/compact|eloquence|grandma|grandpa|shelley|rocko|reed|sandy|flo |eddy|espeak/.test(n + " ")) sc -= 12;
+  return sc;
+}
+function rankedVoices(){ return VOICES.slice().sort((a, b) => voiceScore(b) - voiceScore(a)); }
+function pickVoice(){
+  if(S.voice){ const v = VOICES.find(x => x.voiceURI === S.voice); if(v) return v; }
+  return rankedVoices()[0] || null;
+}
+/* Text so umformen, dass er natürlich vorgelesen wird */
+function speechText(t){
+  const sub = { "₁":" eins", "₂":" zwei", "₃":" drei" };
+  return String(t)
+    .replace(/E_(H)\b/g, "E H").replace(/E_(B)\b/g, "E B").replace(/E_(S)\b/g, "E S")
+    .replace(/E_el\b/g, "E elektrisch").replace(/E_ch\b/g, "E chemisch").replace(/E_therm\b/g, "E thermisch")
+    .replace(/E_Strahl\b/g, "E Strahlung").replace(/E_Kern\b/g, "E Kern").replace(/E_([A-Za-zäöü]+)/g, "E $1")
+    .replace(/([UI])([₁₂₃])/g, (m, a, b) => a + sub[b])
+    .replace(/ΔE/g, "Delta E").replace(/Δt/g, "Delta t")
+    .replace(/\s*→\s*/g, ", dann ").replace(/\s*=\s*/g, " gleich ").replace(/\s*·\s*/g, " mal ").replace(/\s*≈\s*/g, " ungefähr ")
+    .replace(/(\d)\s*kWh\b/g, "$1 Kilowattstunden").replace(/(\d)\s*Wh\b/g, "$1 Wattstunden")
+    .replace(/(\d)\s*kJ\b/g, "$1 Kilojoule").replace(/(\d)\s*MJ\b/g, "$1 Megajoule").replace(/(\d)\s*J\b/g, "$1 Joule")
+    .replace(/(\d)\s*kW\b/g, "$1 Kilowatt").replace(/(\d)\s*W\b/g, "$1 Watt")
+    .replace(/(\d)\s*mA\b/g, "$1 Milliampere").replace(/(\d)\s*A\b/g, "$1 Ampere")
+    .replace(/(\d)\s*kV\b/g, "$1 Kilovolt").replace(/(\d)\s*V\b/g, "$1 Volt")
+    .replace(/(\d)\s*km\/h\b/g, "$1 Kilometer pro Stunde").replace(/(\d)\s*°C\b/g, "$1 Grad Celsius")
+    .replace(/(\d)\s*kg\b/g, "$1 Kilogramm").replace(/(\d)\s*g\b/g, "$1 Gramm").replace(/(\d)\s*mm\/s\b/g, "$1 Millimeter pro Sekunde")
+    .replace(/(\d)\s*m\b/g, "$1 Meter").replace(/(\d)\s*s\b/g, "$1 Sekunden").replace(/(\d)\s*h\b/g, "$1 Stunden")
+    .replace(/\bz\. ?B\./g, "zum Beispiel").replace(/\bS\. (\d)/g, "Seite $1").replace(/\bca\./g, "circa")
+    .replace(/\b1 (Kilowattstunde|Wattstunde)n\b/g, "eine $1").replace(/…/g, " … ").replace(/[„“"]/g, "").replace(/\s+/g, " ").trim();
+}
+function speakQueue(parts){
+  try{
+    if(!("speechSynthesis" in window)) return;
+    const syn = window.speechSynthesis;
+    syn.cancel();
+    if(!VOICES.length) loadVoices();
+    const v = pickVoice();
+    const chunks = [];
+    parts.forEach(p => String(p).split(/(?<=[.!?…:])\s+/).forEach(c => { if(c.trim()) chunks.push(c.trim()); }));
+    chunks.forEach(c => {
+      const u = new SpeechSynthesisUtterance(c);
+      u.lang = (v && v.lang) || "de-DE";
+      if(v) u.voice = v;
+      u.rate = S.rate || 0.95;
+      u.pitch = 1;
+      syn.speak(u);
+    });
+  }catch(e){}
+}
+function speak(text){ speakQueue([speechText(text)]); }
+
+function answerText(q, given){
+  if(given===undefined || given===null || given==="") return "(keine Antwort)";
+  if(q.type==="tf"){ const L = q.labels || ["wahr","falsch"]; return given ? L[0] : L[1]; }
+  if(q.type==="mc") return q.options[given];
+  return given;
+}
+function correctText(q){
+  if(q.type==="tf"){ const L = q.labels || ["wahr","falsch"]; return q.answer ? L[0] : L[1]; }
+  if(q.type==="mc") return q.options[q.answer];
+  return q.answer[0].charAt(0).toUpperCase() + q.answer[0].slice(1);
+}
+function isCorrect(q, given){
+  if(q.type==="tf") return given === q.answer;
+  if(q.type==="mc") return given === q.answer;
+  return q.answer.map(norm).includes(norm(given));
+}
+
+
+/* ---------- Audio (Podcasts zum Kapitel) ---------- */
+const fmtTime = t => { t = Math.max(0, Math.floor(t)); return Math.floor(t/60) + ":" + String(t%60).padStart(2,"0"); };
+const mainAudio = ch => (ch.audios||[]).find(a => a.main) || (ch.audios||[])[0];
+function tocList(au, k){
+  if(!au.toc) return "";
+  return `<div style="margin-top:12px"><b class="small">Inhalt – tippe zum Springen</b>` + au.toc.map((s,i) => `
+    <div class="wrongq">
+      <div class="row"><div class="grow"><b>${i+1}. ${esc(s.title)}</b></div>
+      ${s.t!==null && s.t!==undefined ? `<button class="speak" data-seek="${s.t}" data-aud="${k}">▶ ${fmtTime(s.t)}</button>` : `<span class="small muted">–</span>`}</div>
+      <div class="small muted" style="margin-top:3px">${s.points.map(esc).join(" · ")}</div>
+      ${s.note ? `<div class="small" style="margin-top:4px;color:var(--warn);font-weight:700">⚠️ ${fmtSub(s.note)}</div>` : ""}
+    </div>`).join("") + `</div>`;
+}
+function playerHtml(au, k, open){
+  return `<audio id="aud-${k}" preload="metadata" src="${esc(au.src)}"></audio>
+    <div class="player">
+      <input type="range" class="seek" id="seek-${k}" min="0" max="${au.seconds||1680}" step="1" value="0" aria-label="Position">
+      <div class="row small muted" style="margin-top:2px"><span id="cur-${k}">0:00</span><span class="grow"></span><span id="dur-${k}">${au.seconds?fmtTime(au.seconds):"–:–"}</span></div>
+      <div class="pbtns">
+        <button class="pbtn" data-skip="-15" data-aud="${k}" aria-label="15 Sekunden zurück">↺<small>15</small></button>
+        <button class="pbtn play" id="play-${k}" data-aud="${k}" aria-label="Abspielen">▶</button>
+        <button class="pbtn" data-skip="15" data-aud="${k}" aria-label="15 Sekunden vor">↻<small>15</small></button>
+      </div>
+    </div>
+    <div class="small muted" id="audpos-${k}"></div>
+    ${au.note ? `<div class="small" style="margin-top:6px;background:var(--warn-soft);border-radius:10px;padding:8px 10px">⚠️ ${esc(au.note)}</div>` : ""}
+    <details ${open?"open":""} style="margin-top:6px"><summary class="small" style="cursor:pointer;font-weight:700;color:var(--accent)">Inhaltsübersicht</summary>${tocList(au, k)}</details>`;
+}
+function audioBlock(ch){
+  if(!ch.audios || !ch.audios.length) return "";
+  const main = mainAudio(ch);
+  let html = `<div class="card"><div class="row"><div style="font-size:1.6rem">🎧</div><div class="grow"><b>Kapitel anhören</b><div class="small muted">${esc(main.title)} · ${esc(main.length||"")}</div></div></div>
+    ${playerHtml(main, ch.audios.indexOf(main))}`;
+  ch.audios.forEach((au, k) => {
+    if(au === main) return;
+    html += `<details style="margin-top:14px;border-top:1px dashed var(--line);padding-top:10px"><summary class="small" style="cursor:pointer;font-weight:700">🎧 ${esc(au.title)} · ${esc(au.length||"")}</summary>${playerHtml(au, k)}</details>`;
+  });
+  return html + `</div>`;
+}
+function bindAudio(ch){
+  if(!ch.audios) return;
+  const players = [];
+  ch.audios.forEach((au, k) => {
+    const a = document.getElementById("aud-" + k); if(!a) return;
+    players[k] = a;
+    const key = "audiopos:" + au.src;
+    let saved = 0; try{ saved = parseFloat(localStorage.getItem(key)||"0")||0; }catch(e){}
+    const pos = document.getElementById("audpos-" + k);
+    if(saved > 5 && pos) pos.textContent = "Weiter bei " + fmtTime(saved);
+    a.addEventListener("loadedmetadata", () => { if(saved > 5 && saved < a.duration - 5 && a.currentTime < 1) a.currentTime = saved; }, { once:true });
+    let last = 0;
+    a.addEventListener("timeupdate", () => { if(Math.abs(a.currentTime - last) > 4){ last = a.currentTime; try{ localStorage.setItem(key, String(a.currentTime)); }catch(e){} } });
+    a.addEventListener("play", () => players.forEach(p => { if(p && p !== a) p.pause(); }));
+    const seek = document.getElementById("seek-" + k), cur = document.getElementById("cur-" + k), dur = document.getElementById("dur-" + k), pb = document.getElementById("play-" + k);
+    let dragging = false;
+    const sync = () => { if(!dragging && seek) seek.value = Math.floor(a.currentTime); if(cur) cur.textContent = fmtTime(a.currentTime); };
+    a.addEventListener("loadedmetadata", () => { if(seek && isFinite(a.duration)){ seek.max = Math.floor(a.duration); } if(dur && isFinite(a.duration)) dur.textContent = fmtTime(a.duration); sync(); });
+    a.addEventListener("timeupdate", sync);
+    a.addEventListener("play", () => { if(pb){ pb.textContent = "❚❚"; pb.setAttribute("aria-label","Pause"); } });
+    a.addEventListener("pause", () => { if(pb){ pb.textContent = "▶"; pb.setAttribute("aria-label","Abspielen"); } });
+    if(pb) pb.onclick = () => { if(a.paused) a.play().catch(()=>{}); else a.pause(); };
+    if(seek){
+      seek.addEventListener("input", () => { dragging = true; if(cur) cur.textContent = fmtTime(seek.value); });
+      seek.addEventListener("change", () => { a.currentTime = parseFloat(seek.value); dragging = false; });
+    }
+    document.querySelectorAll(`[data-skip][data-aud="${k}"]`).forEach(b => b.onclick = () => {
+      const d = parseFloat(b.dataset.skip);
+      const go = () => { a.currentTime = Math.max(0, Math.min((isFinite(a.duration)?a.duration:1e9) - 0.5, a.currentTime + d)); sync(); };
+      if(a.readyState >= 1) go(); else { a.addEventListener("loadedmetadata", go, { once:true }); a.load(); }
+    });
+  });
+  document.querySelectorAll("[data-seek]").forEach(b => b.onclick = () => {
+    const k = parseInt(b.dataset.aud || "0", 10);
+    const a = players[k]; if(!a) return;
+    const t = parseFloat(b.dataset.seek);
+    const det = a.closest("details"); if(det && !det.open && det.querySelector("audio") === a) det.open = true;
+    const play = () => { a.currentTime = t; a.play().catch(()=>{}); };
+    if(a.readyState >= 1) play(); else { a.addEventListener("loadedmetadata", play, { once:true }); a.load(); }
+    a.scrollIntoView({ behavior:"smooth", block:"center" });
+  });
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+let view = { name:"home" };
+function go(v){ view = v; try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} render(); window.scrollTo(0,0); }
+function render(){
+  if(!S.pw) return renderSetup();
+  switch(view.name){
+    case "home": return renderHome();
+    case "set": return renderSet(view.setId);
+    case "quiz": return renderQuiz(view.setId);
+    case "learn": return renderLearn(view.setId);
+    case "gate": return renderGate();
+    case "review": return renderReview(view.setId);
+    case "settings": return renderSettings();
+    case "help": return renderHelp();
+    default: return renderHome();
+  }
+}
+
+function topbar(title, back){
+  return `<div class="topbar">
+    ${back ? `<button class="iconbtn" data-act="back" aria-label="Zurück">←</button>` : ""}
+    <div class="grow"><h1>${esc(title)}</h1></div>
+    ${!back ? `<button class="iconbtn" data-act="settings" aria-label="Eltern-Bereich">🔒</button>` : ""}
+  </div>`;
+}
+function bindTopbar(backTo){
+  const b = $app.querySelector('[data-act="back"]'); if(b) b.onclick = () => go(backTo || {name:"home"});
+  const s = $app.querySelector('[data-act="settings"]'); if(s) s.onclick = () => go({ name:"gate", title:"Eltern-Bereich", next:{name:"settings"}, back:{name:"home"} });
+}
+
+function stageBadge(st){
+  if(st.stage==="new") return `<span class="badge b-new">Neu</span>`;
+  if(st.stage==="quiz") return `<span class="badge b-quiz">Runde ${st.round} läuft</span>`;
+  if(st.stage==="learn") return `<span class="badge b-learn">Lernen</span>`;
+  if(st.stage==="done") return `<span class="badge b-done">Geschafft ✓</span>`;
+  return "";
+}
+
+/* ---------- Ersteinrichtung ---------- */
+function renderSetup(){
+  $app.innerHTML = `
+    <div class="big-emoji">🔐</div>
+    <h1 class="center">Einrichtung für Eltern</h1>
+    <p class="center muted">Lege ein Passwort fest. Es wird für die Freigabe nach dem Lernen gebraucht. Nur du solltest es kennen.</p>
+    <div class="card">
+      <label class="small muted">Passwort</label>
+      <input type="password" id="pw1" autocomplete="new-password">
+      <div style="height:10px"></div>
+      <label class="small muted">Passwort wiederholen</label>
+      <input type="password" id="pw2" autocomplete="new-password">
+      <div class="err" id="err"></div>
+      <button class="btn" id="save">Passwort speichern</button>
+    </div>
+    ${!storageOK ? `<p class="small" style="color:var(--bad)">Achtung: Dieser Browser erlaubt kein dauerhaftes Speichern. Fortschritt geht beim Schließen verloren.</p>` : ""}
+    <p class="footer-note">Das Passwort wird nur verschlüsselt (als Prüfsumme) auf diesem Gerät gespeichert.</p>`;
+  document.getElementById("save").onclick = async () => {
+    const a = document.getElementById("pw1").value, b = document.getElementById("pw2").value;
+    const err = document.getElementById("err");
+    if(a.length < 4){ err.textContent = "Mindestens 4 Zeichen."; return; }
+    if(a !== b){ err.textContent = "Die Passwörter stimmen nicht überein."; return; }
+    S.pw = { salt: Math.random().toString(36).slice(2) + Date.now().toString(36) };
+    S.pw.hash = await hashPw(a);
+    saveStore(); go({name:"home"});
+  };
+}
+
+/* ---------- Start ---------- */
+let memOpen = [];
+function openChapters(){ try{ return JSON.parse(localStorage.getItem("lernapp.openchapters") || "[]"); }catch(e){ return memOpen; } }
+function renderHome(){
+  let html = topbar("Meine Lern-App", false);
+  html += `<p class="muted">Wähle ein Fach und ein Kapitel.</p>`;
+  for(const sub of SUBJECTS){
+    html += `<h2>${sub.icon} ${esc(sub.name)}</h2>`;
+    for(const ch of sub.chapters){
+      const isOpen = openChapters().includes(ch.id);
+      const open = ch.sets.filter(st => { const x = setState(st.id).stage; return x === "quiz" || x === "learn"; }).length;
+      html += `<details class="card chapter" data-ch="${ch.id}" ${isOpen?"open":""}><summary class="row" style="cursor:pointer;list-style:none">
+        <div class="grow"><h3 style="margin:0">${ch.icon?`<span style="font-size:1.3rem;margin-right:6px">${ch.icon}</span>`:""}${esc(ch.title)}</h3>
+        <div class="small muted">${esc(ch.book)}${(ch.audios&&ch.audios.length)?" · 🎧 mit Podcast":""}${open?` · <span style="color:var(--warn);font-weight:700">${open} in Arbeit</span>`:""}</div></div>
+        <span class="muted chev">▾</span></summary>`;
+      for(const st of ch.sets){
+        const s = setState(st.id);
+        html += `<div class="card tap" data-set="${st.id}" style="margin:10px 0 0;padding:13px">
+          <div class="row"><div class="grow"><b>${esc(st.title)}</b><div class="small muted">${esc(st.desc)} · ${st.questions.length} Fragen</div></div>${stageBadge(s)}</div>
+        </div>`;
+      }
+      html += `</details>`;
+    }
+  }
+  html += `<button class="btn secondary" id="help">Wie funktioniert die App?</button>`;
+  $app.innerHTML = html;
+  bindTopbar();
+  $app.querySelectorAll("[data-set]").forEach(el => el.onclick = () => go({ name:"set", setId: el.dataset.set }));
+  $app.querySelectorAll("details.chapter").forEach(d => d.addEventListener("toggle", () => {
+    const list = openChapters().filter(id => id !== d.dataset.ch);
+    if(d.open) list.push(d.dataset.ch);
+    try{ localStorage.setItem("lernapp.openchapters", JSON.stringify(list)); }catch(e){ memOpen = list; }
+  }));
+  document.getElementById("help").onclick = () => go({name:"help"});
+}
+
+function renderHelp(){
+  $app.innerHTML = topbar("So funktioniert's", true) + `
+    <div class="card"><h3>1. Quiz</h3><p>Beantworte alle Fragen. Sag die Antwort zuerst <b>laut</b>, dann tippe sie an. Mit 🔊 wird die Frage vorgelesen.</p></div>
+    <div class="card"><h3>2. Lernen</h3><p>Du bekommst eine Leseliste: genau die Stellen im Buch, die zu deinen Fehlern gehören.</p></div>
+    <div class="card"><h3>3. Erklären</h3><p>Erkläre deinen Eltern für jeden Fehler: Was hast du geantwortet? Warum war das falsch? Was ist richtig – und warum?</p></div>
+    <div class="card"><h3>4. Freigabe</h3><p>Deine Eltern geben mit ihrem Passwort frei. Dann beantwortest du die Fragen nochmal – so lange, bis alles sitzt.</p></div>`;
+  bindTopbar({name:"home"});
+}
+
+/* ---------- Übersicht eines Fragensets ---------- */
+function renderSet(setId){
+  const f = findSet(setId); if(!f) return go({name:"home"});
+  const st = setState(setId);
+  let html = topbar(f.set.title, true);
+  html += `<p class="muted">${esc(f.sub.name)} · ${f.ch.icon?f.ch.icon+" ":""}${esc(f.ch.title)}</p>`;
+  {
+    const lastH = st.history[st.history.length-1];
+    html += `<details class="card statusbox"><summary class="row" style="cursor:pointer;list-style:none">
+        <div class="grow"><b>Status</b>${lastH ? `<span class="small muted"> · zuletzt ${lastH.correct}/${lastH.total}</span>` : ""}</div>
+        ${stageBadge(st)}<span class="small muted chev">▾</span></summary>`;
+    html += st.history.length
+      ? `<div style="margin-top:8px">` + st.history.map(h => `<div class="kv"><span>Runde ${h.round} · ${esc(h.date)}</span><b>${h.correct} / ${h.total} richtig</b></div>`).join("") + `</div>`
+      : `<div class="small muted" style="margin-top:8px">Noch keine Runde gespielt.</div>`;
+    html += `</details>`;
+  }
+  html += audioBlock(f.ch);
+
+  if(st.stage==="new"){
+    html += `<div class="steps"><b>So geht's:</b><ol><li>Quiz machen (${f.set.questions.length} Fragen, du kannst zwischendurch aufhören).</li><li>Die Stellen lesen, die du falsch hattest.</li><li>Den Eltern erklären, dann Freigabe.</li><li>Fehlerfragen nochmal beantworten.</li></ol></div>`;
+    html += `<button class="btn" id="start">Runde 1 starten</button>`;
+  } else if(st.stage==="quiz"){
+    html += `<button class="btn" id="cont">Weiter mit Runde ${st.round} (Frage ${st.idx+1} von ${st.queue.length})</button>`;
+  } else if(st.stage==="learn"){
+    html += `<button class="btn" id="learn">Zur Leseliste (${st.wrong.length} Fehler)</button>`;
+  } else if(st.stage==="done"){
+    html += `<div class="card center"><div class="big-emoji">🏆</div><h3>Alles richtig!</h3><p class="muted">Dieses Set sitzt. Zur Wiederholung kurz vor der Arbeit einfach neu starten.</p></div>`;
+  }
+  if(st.stage!=="new"){
+    html += `<button class="btn secondary" id="restart">Komplett neu starten (Eltern)</button>`;
+  }
+  $app.innerHTML = html;
+  bindTopbar({name:"home"});
+  bindAudio(f.ch);
+  const on = (id, fn) => { const el = document.getElementById(id); if(el) el.onclick = fn; };
+  on("start", () => { startRound(setId, f.set.questions.map(q=>q.id)); go({name:"quiz", setId}); });
+  on("cont", () => go({name:"quiz", setId}));
+  on("learn", () => go({name:"learn", setId}));
+  on("restart", () => go({ name:"gate", title:"Neu starten", next:{name:"restart", setId}, back:{name:"set", setId} }));
+}
+
+function startRound(setId, ids){
+  const f = findSet(setId); const st = setState(setId);
+  st.round = (st.round||0) + 1;
+  st.queue = shuffle(ids);
+  st.idx = 0; st.answers = {}; st.orders = {}; st.stage = "quiz"; st.read = {};
+  for(const id of st.queue){ const q = qById(f.set, id); if(q && q.type==="mc") st.orders[id] = shuffle(q.options.map((_,i)=>i)); }
+  saveStore();
+}
+
+/* ---------- Quiz ---------- */
+function renderQuiz(setId){
+  const f = findSet(setId); const st = setState(setId);
+  if(st.stage!=="quiz") return go({name:"set", setId});
+  if(st.idx >= st.queue.length) return finishRound(setId);
+  const q = qById(f.set, st.queue[st.idx]);
+  const answered = st.answers[q.id];
+  const pct = Math.round(st.idx / st.queue.length * 100);
+
+  let html = topbar(`Runde ${st.round}`, true);
+  html += `<div class="row small muted"><div class="grow">Frage ${st.idx+1} von ${st.queue.length}${q.section ? " · "+esc(q.section) : ""}</div>
+           <button class="speak" id="say">🔊 Vorlesen</button></div>`;
+  html += `<div class="progress"><div style="width:${pct}%"></div></div>`;
+  html += `<div class="card">`;
+  if(q.context) html += `<div class="context">${fmtSub(q.context)}</div>`;
+  html += `<div class="prompt">${fmtSub(q.prompt)}</div>`;
+
+  if(q.type==="tf"){
+    const L = q.labels || ["wahr","falsch"];
+    const cls = v => answered ? (answered.given===v ? (answered.correct?"picked-ok":"picked-bad") : "") : "";
+    html += `<div class="tfrow">
+      <button class="opt ${cls(true)}" data-v="true" ${answered?"disabled":""}>${esc(L[0])}</button>
+      <button class="opt ${cls(false)}" data-v="false" ${answered?"disabled":""}>${esc(L[1])}</button></div>`;
+    if(!answered) html += `<div class="tip">Tipp: Sag zuerst laut, ob es stimmt – und warum.</div>`;
+  } else if(q.type==="mc"){
+    const order = st.orders[q.id] || q.options.map((_,i)=>i);
+    for(const i of order){
+      const cls = answered ? (answered.given===i ? (answered.correct?"picked-ok":"picked-bad") : "") : "";
+      html += `<button class="opt ${cls}" data-i="${i}" ${answered?"disabled":""}>${fmtSub(q.options[i])}</button>`;
+    }
+    if(!answered) html += `<div class="tip">Tipp: Überleg dir die Antwort erst, bevor du die Möglichkeiten liest.</div>`;
+  } else {
+    html += `<input type="text" id="txt" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Antwort eintippen" ${answered?"disabled":""} value="${answered?esc(answered.given):""}">`;
+    if(!answered) html += `<button class="btn" id="submit">Antwort prüfen</button>`;
+  }
+  html += `</div>`;
+
+  if(answered){
+    html += answered.correct
+      ? `<div class="feedback ok">✓ Richtig!</div>`
+      : `<div class="feedback bad">✗ Leider falsch.
+           <div style="font-weight:600;font-size:.92rem;margin-top:8px;color:var(--ink)">📖 Nachlesen in ${esc(f.ch.title)}:</div>
+           ${q.refs.map(r => { const ref = f.ch.refs[r]; return `<div style="font-weight:600;font-size:.92rem;color:var(--ink);margin-top:4px"><span class="ref-page">${esc(ref.page)}</span> · ${esc(ref.where)}</div>`; }).join("")}
+           <div class="small muted" style="font-weight:600;margin-top:8px">Am Ende der Runde steht das auch in deiner Leseliste.</div>
+         </div>`;
+    html += `<button class="btn" id="next">${st.idx+1 < st.queue.length ? "Nächste Frage" : "Auswertung"}</button>`;
+  }
+  html += `<p class="footer-note">Du kannst jederzeit aufhören – es geht hier weiter.</p>`;
+  $app.innerHTML = html;
+  bindTopbar({name:"set", setId});
+
+  document.getElementById("say").onclick = () => {
+    const parts = [];
+    if(q.context) parts.push(speechText(q.context));
+    let p = speechText(q.prompt); if(!/[.!?…:]$/.test(p)) p += ".";
+    parts.push(p);
+    if(q.type==="mc"){
+      const nums = ["Erstens", "Zweitens", "Drittens", "Viertens", "Fünftens"];
+      (st.orders[q.id]||q.options.map((_,i)=>i)).forEach((i, k) => parts.push(nums[k] + ": " + speechText(q.options[i]) + "."));
+    } else if(q.type==="tf"){
+      const L = q.labels || ["wahr","falsch"];
+      parts.push(L[0] + " oder " + L[1] + "?");
+    }
+    speakQueue(parts);
+  };
+  const record = given => {
+    st.answers[q.id] = { given, correct: isCorrect(q, given) };
+    saveStore(); render();
+  };
+  if(!answered){
+    $app.querySelectorAll("[data-v]").forEach(b => b.onclick = () => record(b.dataset.v==="true"));
+    $app.querySelectorAll("[data-i]").forEach(b => b.onclick = () => record(parseInt(b.dataset.i,10)));
+    const sub = document.getElementById("submit");
+    if(sub){
+      const txt = document.getElementById("txt");
+      const doIt = () => { if(!txt.value.trim()) { txt.focus(); return; } record(txt.value.trim()); };
+      sub.onclick = doIt;
+      txt.addEventListener("keydown", e => { if(e.key==="Enter") doIt(); });
+    }
+  } else {
+    document.getElementById("next").onclick = () => { st.idx++; saveStore(); render(); window.scrollTo(0,0); };
+  }
+}
+
+function finishRound(setId){
+  const f = findSet(setId); const st = setState(setId);
+  const roundWrong = st.queue.filter(id => !(st.answers[id] && st.answers[id].correct));
+  const correct = st.queue.length - roundWrong.length;
+  st.history.push({ round: st.round, date: nowStr(), correct, total: st.queue.length });
+  const pending = (st.pending||[]).filter(id => !roundWrong.includes(id));
+  const wrong = roundWrong.concat(pending);
+  st.wrong = wrong;
+  st.lastAnswers = Object.assign({}, st.pendingAnswers||{}, st.answers);
+  st.pending = []; st.pendingAnswers = {};
+  st.stage = wrong.length ? "learn" : "done";
+  saveStore();
+  go({ name: wrong.length ? "learn" : "set", setId });
+}
+
+/* ---------- Leseliste ---------- */
+function buildReadingList(f, st){
+  const map = {};
+  for(const id of st.wrong){
+    const q = qById(f.set, id); if(!q) continue;
+    for(const r of q.refs){
+      if(!map[r]) map[r] = { ref: f.ch.refs[r], id: r, qs: [] };
+      map[r].qs.push(q);
+    }
+  }
+  return Object.values(map).sort((a,b) => a.ref.p - b.ref.p);
+}
+
+function renderLearn(setId){
+  const f = findSet(setId); const st = setState(setId);
+  if(st.stage!=="learn") return go({name:"set", setId});
+  const last = st.history[st.history.length-1];
+  const list = buildReadingList(f, st);
+  const allRead = list.every(item => st.read[item.id]);
+
+  let html = topbar("Deine Leseliste", true);
+  html += `<div class="card"><div class="row"><div class="grow"><b>Runde ${last.round}</b><div class="small muted">${last.correct} von ${last.total} richtig</div></div><span class="badge b-learn">${st.wrong.length} offen</span></div></div>`;
+  html += `<div class="steps"><b>So lernst du:</b><ol>
+    <li>Lies die Stelle im Buch.</li>
+    <li>Buch zu.</li>
+    <li>Hake ab, wenn du es erklären kannst.</li>
+  </ol></div>`;
+  html += `<h2>${list.length} ${list.length===1?"Stelle":"Stellen"} im Buch</h2>`;
+  for(const item of list){
+    html += `<div class="card">
+      <div><span class="ref-page">${esc(item.ref.page)}</span> · <b>${esc(item.ref.topic)}</b></div>
+      <div class="small muted" style="margin-top:3px">${esc(item.ref.where)}</div>
+      ${(() => { const au = mainAudio(f.ch); if(!au || item.ref.toc===undefined || !au.toc[item.ref.toc]) return ""; const k = f.ch.audios.indexOf(au); const s = au.toc[item.ref.toc]; return `<button class="speak" data-seek="${s.t}" data-aud="${k}" style="margin-top:8px">🎧 Anhören: „${esc(s.title)}“ ab ${fmtTime(s.t)}</button>`; })()}`;
+    for(const q of item.qs){
+      const a = (st.lastAnswers||{})[q.id];
+      html += `<div class="wrongq">${q.context?`<span class="muted">${fmtSub(q.context)}</span><br>`:""}${fmtSub(q.prompt)}<div class="ans-line">Deine Antwort: <span class="ans-bad">${esc(answerText(q, a && a.given))}</span></div></div>`;
+    }
+    html += `<label class="check"><input type="checkbox" data-read="${item.id}" ${st.read[item.id]?"checked":""}> Gelesen – ich kann's erklären</label></div>`;
+  }
+  html += audioBlock(f.ch);
+  html += `<div class="steps" style="margin-top:16px"><b>Dann zu deinen Eltern – erkläre für jede Frage:</b><ol>
+    <li>Was habe ich geantwortet?</li>
+    <li>Warum war das falsch?</li>
+    <li>Was ist richtig – und warum?</li>
+  </ol></div>`;
+  html += `<button class="btn" id="gate" ${allRead?"":"disabled"}>Eltern: Freigabe</button>`;
+  html += `<p class="small muted center" id="readhint" style="${allRead?"display:none":""}">Hake erst alle Stellen ab.</p>`;
+  $app.innerHTML = html;
+  bindTopbar({name:"set", setId});
+  bindAudio(f.ch);
+  $app.querySelectorAll("[data-read]").forEach(cb => cb.onchange = () => {
+    st.read[cb.dataset.read] = cb.checked; saveStore();
+    const ok = list.every(item => st.read[item.id]);
+    const g = document.getElementById("gate"); if(g) g.disabled = !ok;
+    const hint = document.getElementById("readhint"); if(hint) hint.style.display = ok ? "none" : "";
+  });
+  const g = document.getElementById("gate");
+  if(g) g.onclick = () => go({ name:"gate", title:"Freigabe", next:{name:"review", setId}, back:{name:"learn", setId} });
+}
+
+/* ---------- Passwort-Abfrage ---------- */
+function renderGate(){
+  const v = view;
+  $app.innerHTML = topbar(v.title || "Passwort", true) + `
+    <div class="big-emoji">🔒</div>
+    <p class="center muted">Nur für Eltern.</p>
+    <div class="card">
+      <input type="password" id="pw" autocomplete="current-password" placeholder="Passwort">
+      <div class="err" id="err"></div>
+      <button class="btn" id="ok">Weiter</button>
+    </div>`;
+  bindTopbar(v.back || {name:"home"});
+  const pw = document.getElementById("pw");
+  const check = async () => {
+    const h = await hashPw(pw.value);
+    if(h !== S.pw.hash){ document.getElementById("err").textContent = "Falsches Passwort."; pw.value=""; pw.focus(); return; }
+    const n = v.next;
+    if(n.name==="restart"){
+      const st = setState(n.setId);
+      Object.assign(st, { stage:"new", round:0, queue:[], idx:0, answers:{}, orders:{}, wrong:[], read:{}, pending:[], pendingAnswers:{} });
+      saveStore(); return go({name:"set", setId:n.setId});
+    }
+    go(Object.assign({}, n, { authed:true }));
+  };
+  document.getElementById("ok").onclick = check;
+  pw.addEventListener("keydown", e => { if(e.key==="Enter") check(); });
+  setTimeout(()=>pw.focus(), 50);
+}
+
+/* ---------- Freigabe (Eltern) – einzeln je Frage ---------- */
+function renderReview(setId){
+  if(!view.authed) return go({name:"learn", setId});
+  const f = findSet(setId); const st = setState(setId);
+  if(!view.dec) view.dec = {};
+  const dec = view.dec;
+  const n = st.wrong.length;
+  const decided = st.wrong.filter(id => dec[id]!==undefined).length;
+  const nPass = st.wrong.filter(id => dec[id]===true).length;
+  const nFail = st.wrong.filter(id => dec[id]===false).length;
+
+  let html = topbar("Freigabe", true);
+  html += `<p class="muted">Lass dir jede Frage erklären und entscheide einzeln. Freigegebene Fragen kommen in die nächste Runde, nicht bestandene bleiben auf seiner Leseliste.</p>`;
+  html += `<div class="row small" style="margin:6px 0 2px"><div class="grow muted">${decided} von ${n} entschieden</div>
+           <button class="speak" id="allok">Alle bestanden</button></div>`;
+  st.wrong.forEach((id, k) => {
+    const q = qById(f.set, id); const a = (st.lastAnswers||{})[id];
+    const d = dec[id];
+    const border = d===true ? "var(--ok)" : d===false ? "var(--bad)" : "var(--line)";
+    html += `<div class="card" style="border:2px solid ${border}">
+      <div class="small muted">Frage ${k+1} von ${n}</div>
+      ${q.context?`<div class="small muted" style="margin-top:4px">${fmtSub(q.context)}</div>`:""}
+      <div style="font-weight:700;margin:4px 0">${fmtSub(q.prompt)}</div>
+      <div class="ans-line">Gegebene Antwort: <span class="ans-bad">${esc(answerText(q, a && a.given))}</span></div>
+      <div class="ans-line">Richtig: <span class="ans-ok">${fmtSub(correctText(q))}</span></div>
+      <div class="small" style="margin-top:6px">${fmtSub(q.explain)}</div>
+      <div class="small muted" style="margin-top:4px">${q.refs.map(r=>esc(f.ch.refs[r].page)).join(", ")}</div>
+      <div class="tfrow" style="margin-top:8px">
+        <button class="opt ${d===true?"picked-ok":""}" data-dec="${id}" data-ok="1" style="padding:11px">✓ Bestanden</button>
+        <button class="opt ${d===false?"picked-bad":""}" data-dec="${id}" data-ok="0" style="padding:11px">✗ Nochmal lernen</button>
+      </div>
+    </div>`;
+  });
+  const others = f.set.questions.length - nFail;
+  html += `<div class="card"><h3>Ergebnis</h3>
+    <div class="kv"><span>Bestanden → kommen in Runde ${st.round+1}</span><b style="color:var(--ok)">${nPass}</b></div>
+    <div class="kv"><span>Nicht bestanden → bleiben auf der Leseliste</span><b style="color:var(--bad)">${nFail}</b></div>`;
+  if(nPass>0){
+    html += `<p class="small muted" style="margin-top:10px">Nächste Runde:</p>
+    <div class="seg">
+      <label><input type="radio" name="mode" value="wrong" ${view.mode!=="all"?"checked":""}><span>Nur die ${nPass} freigegebenen</span></label>
+      <label><input type="radio" name="mode" value="all" ${view.mode==="all"?"checked":""}><span>Alle ${others} Fragen</span></label>
+    </div>`;
+  }
+  html += `<textarea id="note" rows="2" placeholder="Notiz (optional)">${esc(view.note||"")}</textarea>
+    <button class="btn" id="save" ${decided<n?"disabled":""}>Freigabe speichern</button>
+    ${decided<n?`<p class="small muted center">Bitte zu jeder Frage entscheiden.</p>`:""}
+  </div>`;
+  if(st.approvals.length){
+    html += `<div class="card"><h3>Bisherige Freigaben</h3>` + st.approvals.slice().reverse().map(a => {
+      const res = (a.passed!==undefined) ? `<b><span style="color:var(--ok)">${a.passed} ✓</span> · <span style="color:var(--bad)">${a.failed} ✗</span></b>`
+        : `<b style="color:${a.ok?"var(--ok)":"var(--bad)"}">${a.ok?"bestanden":"nicht bestanden"}</b>`;
+      return `<div class="kv"><span>${esc(a.date)} · nach Runde ${a.round}${a.note?` · ${esc(a.note)}`:""}</span>${res}</div>`;
+    }).join("") + `</div>`;
+  }
+  const y = window.scrollY;
+  $app.innerHTML = html;
+  window.scrollTo(0, y);
+  bindTopbar({name:"learn", setId});
+  const keep = () => { const m = $app.querySelector('input[name="mode"]:checked'); if(m) view.mode = m.value; view.note = document.getElementById("note").value; };
+  $app.querySelectorAll("[data-dec]").forEach(b => b.onclick = () => { keep(); dec[b.dataset.dec] = b.dataset.ok==="1"; renderReview(setId); });
+  document.getElementById("allok").onclick = () => { keep(); st.wrong.forEach(id => dec[id]=true); renderReview(setId); };
+  $app.querySelectorAll('input[name="mode"]').forEach(r => r.onchange = keep);
+  document.getElementById("save").onclick = () => {
+    keep();
+    const passed = st.wrong.filter(id => dec[id]===true);
+    const failed = st.wrong.filter(id => dec[id]===false);
+    st.approvals.push({ date: nowStr(), round: st.round, passed: passed.length, failed: failed.length, note: (view.note||"").trim() });
+    if(passed.length===0){
+      st.read = {};
+      saveStore();
+      return go({name:"learn", setId});
+    }
+    // Nicht bestandene merken: sie kommen nach der nächsten Runde wieder auf die Leseliste
+    const keepAns = {};
+    for(const id of failed) keepAns[id] = (st.lastAnswers||{})[id];
+    st.pending = failed;
+    st.pendingAnswers = keepAns;
+    const ids = view.mode==="all" ? f.set.questions.map(q=>q.id).filter(id => !failed.includes(id)) : passed;
+    startRound(setId, ids);
+    go({name:"quiz", setId});
+  };
+}
+
+/* ---------- Eltern-Bereich ---------- */
+function renderSettings(){
+  if(!view.authed) return go({name:"home"});
+  let html = topbar("Eltern-Bereich", true);
+  html += `<div class="card"><h3>Überblick</h3>`;
+  for(const sub of SUBJECTS) for(const ch of sub.chapters) for(const st of ch.sets){
+    const s = setState(st.id); const last = s.history[s.history.length-1];
+    html += `<div class="kv"><span>${esc(sub.name)} · ${esc(st.title)}</span><span>${last?`${last.correct}/${last.total}`:"–"} ${stageBadge(s)}</span></div>`;
+  }
+  html += `</div>`;
+  {
+    const ranked = rankedVoices();
+    html += `<div class="card"><h3>🔊 Vorlese-Stimme</h3>
+      ${ranked.length ? `<select id="voicesel" style="width:100%;font:inherit;padding:11px;border:2px solid var(--line);border-radius:12px;background:#fff">
+        <option value="">Automatisch (beste verfügbare)</option>
+        ${ranked.map(v => `<option value="${esc(v.voiceURI)}" ${S.voice===v.voiceURI?"selected":""}>${esc(v.name)}</option>`).join("")}
+      </select>` : `<p class="small muted">Keine deutsche Stimme gefunden.</p>`}
+      <div class="row" style="margin-top:10px"><span class="small">Tempo</span>
+        <input type="range" id="ratesel" min="0.75" max="1.15" step="0.05" value="${S.rate||0.95}" class="grow"></div>
+      <button class="btn secondary inline" id="voicetest">Probe hören</button>
+      <p class="small muted">Bessere Stimmen kann man auf dem Handy kostenlos nachladen (siehe Hinweis von Claude). Danach hier auswählen.</p>
+    </div>`;
+  }
+  html += `<div class="card"><h3>💾 Sicherung</h3>
+    <p class="small muted">Erzeugt einen Code mit dem ganzen Lernstand und dem Passwort. Schick ihn dir z. B. per WhatsApp. Mit „Wiederherstellen“ spielst du ihn wieder ein.</p>
+    <button class="btn secondary inline" id="bkmake">Sicherungscode erzeugen</button>
+    <textarea id="bkcode" rows="3" placeholder="Hier erscheint der Code – oder einen Code zum Wiederherstellen einfügen" style="margin-top:8px;font-size:.8rem"></textarea>
+    <div class="row" style="gap:8px"><button class="btn secondary inline" id="bkcopy">Kopieren</button><button class="btn secondary inline" id="bkload">Wiederherstellen</button></div>
+    <div class="err" id="bkmsg"></div>
+  </div>`;
+  html += `<div class="card"><h3>Passwort ändern</h3>
+    <input type="password" id="n1" placeholder="Neues Passwort" autocomplete="new-password"><div style="height:8px"></div>
+    <input type="password" id="n2" placeholder="Neues Passwort wiederholen" autocomplete="new-password">
+    <div class="err" id="err"></div>
+    <button class="btn secondary" id="chg">Speichern</button></div>`;
+  html += `<p class="footer-note">Daten liegen nur auf diesem Gerät. Werden die Browserdaten gelöscht, sind Fortschritt und Passwort weg – die App startet dann mit der Einrichtung neu.</p>`;
+  $app.innerHTML = html;
+  bindTopbar({name:"home"});
+  const vs = document.getElementById("voicesel");
+  if(vs) vs.onchange = () => { S.voice = vs.value || null; saveStore(); };
+  const rs = document.getElementById("ratesel");
+  if(rs) rs.onchange = () => { S.rate = parseFloat(rs.value); saveStore(); };
+  const vt = document.getElementById("voicetest");
+  if(vt) vt.onclick = () => speak("Ein hochgehobener Gegenstand hat Höhenenergie E_H. 1 J reicht, um 100 g Schokolade 1 m hochzuheben.");
+  const bkmsg = document.getElementById("bkmsg"), bkcode = document.getElementById("bkcode");
+  document.getElementById("bkmake").onclick = () => {
+    try{
+      const json = JSON.stringify(S);
+      bkcode.value = "LERNAPP1:" + btoa(unescape(encodeURIComponent(json)));
+      bkmsg.style.color = "var(--ok)"; bkmsg.textContent = "Code erzeugt (" + new Date().toLocaleDateString("de-DE") + "). Jetzt kopieren und sicher aufbewahren.";
+    }catch(e){ bkmsg.style.color = ""; bkmsg.textContent = "Konnte keinen Code erzeugen."; }
+  };
+  document.getElementById("bkcopy").onclick = async () => {
+    if(!bkcode.value){ bkmsg.style.color = ""; bkmsg.textContent = "Erst einen Code erzeugen."; return; }
+    try{ await navigator.clipboard.writeText(bkcode.value); bkmsg.style.color = "var(--ok)"; bkmsg.textContent = "Kopiert."; }
+    catch(e){ bkcode.select(); bkmsg.style.color = ""; bkmsg.textContent = "Bitte den markierten Code selbst kopieren."; }
+  };
+  let bkConfirm = false;
+  document.getElementById("bkload").onclick = () => {
+    const raw = (bkcode.value || "").trim();
+    if(!raw.startsWith("LERNAPP1:")){ bkmsg.style.color = ""; bkmsg.textContent = "Das ist kein gültiger Sicherungscode."; return; }
+    let data;
+    try{ data = JSON.parse(decodeURIComponent(escape(atob(raw.slice(9))))); }catch(e){ bkmsg.style.color = ""; bkmsg.textContent = "Der Code ist beschädigt oder unvollständig."; return; }
+    if(!data || typeof data !== "object" || !data.sets){ bkmsg.style.color = ""; bkmsg.textContent = "Der Code enthält keinen Lernstand."; return; }
+    if(!bkConfirm){ bkConfirm = true; bkmsg.style.color = "var(--warn)"; bkmsg.textContent = "Achtung: Der jetzige Stand wird ersetzt. Zum Bestätigen nochmal auf „Wiederherstellen“ tippen."; return; }
+    S = data; saveStore();
+    bkmsg.style.color = "var(--ok)"; bkmsg.textContent = "Wiederhergestellt.";
+    setTimeout(() => go({name:"home"}), 900);
+  };
+  document.getElementById("chg").onclick = async () => {
+    const a = document.getElementById("n1").value, b = document.getElementById("n2").value, err = document.getElementById("err");
+    if(a.length<4){ err.textContent="Mindestens 4 Zeichen."; return; }
+    if(a!==b){ err.textContent="Stimmt nicht überein."; return; }
+    S.pw.salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    S.pw.hash = await hashPw(a); saveStore();
+    err.style.color = "var(--ok)"; err.textContent = "Gespeichert.";
+  };
+}
+
+render();
+</script>
+</body>
+</html>
