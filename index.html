@@ -1427,7 +1427,7 @@ function playerHtml(au, k, open){
 function audioBlock(ch){
   if(!ch.audios || !ch.audios.length) return "";
   const main = mainAudio(ch);
-  let html = `<div class="card"><div class="row"><div style="font-size:1.6rem">🎧</div><div class="grow"><b>Kapitel anhören</b><div class="small muted">${esc(main.title)} · ${esc(main.length||"")}</div></div></div>
+  let html = `<div class="card"><div class="row"><div style="font-size:1.6rem">🎧</div><div class="grow"><b>Podcast: Kapitel anhören</b><div class="small muted">${esc(main.title)} · ${esc(main.length||"")}</div></div></div>
     ${playerHtml(main, ch.audios.indexOf(main))}`;
   ch.audios.forEach((au, k) => {
     if(au === main) return;
@@ -1494,7 +1494,7 @@ function render(){
     case "review": return renderReview(view.setId);
     case "settings": return renderSettings();
     case "help": return renderHelp();
-    case "materials": return renderMaterials(view.chId);
+    case "materials": return renderMaterials(view.chId, view.seek, view.back);
     default: return renderHome();
   }
 }
@@ -1520,13 +1520,14 @@ function stageBadge(st){
 }
 
 
-/* ---------- Weitere Lernmaterialien ---------- */
+/* ---------- Lernmaterialien (Podcast, Video, Infografik) ---------- */
 function findChapter(chId){ for(const sub of SUBJECTS) for(const ch of sub.chapters) if(ch.id===chId) return { sub, ch }; return null; }
-function renderMaterials(chId){
+function renderMaterials(chId, seek, back){
   const f = findChapter(chId); if(!f) return go({name:"home"});
   let html = topbar("Lernmaterialien", true);
   html += `<p class="muted">${esc(f.sub.name)} · ${f.ch.icon?f.ch.icon+" ":""}${esc(f.ch.title)}</p>`;
-  f.ch.materials.forEach((m, i) => {
+  html += audioBlock(f.ch);
+  (f.ch.materials||[]).forEach((m, i) => {
     html += `<div class="card"><h3>${m.type==="video"?"🎬":"🖼️"} ${esc(m.title)}</h3><p class="small muted" style="margin-top:0">${esc(m.sub)}</p>`;
     if(m.type==="video"){
       html += `<video src="${esc(m.src)}" ${m.poster?`poster="${esc(m.poster)}"`:""} controls playsinline preload="metadata" style="width:100%;max-height:70vh;border-radius:12px;background:#000;display:block"></video>`;
@@ -1542,7 +1543,17 @@ function renderMaterials(chId){
       <img id="zoomimg" style="width:250%;max-width:none;display:block">
     </div>`;
   $app.innerHTML = html;
-  bindTopbar({name:"home"});
+  bindTopbar(back || {name:"home"});
+  bindAudio(f.ch);
+  if(seek !== undefined && !isNaN(seek)){
+    const au = mainAudio(f.ch), a = au && document.getElementById("aud-" + f.ch.audios.indexOf(au));
+    if(a){
+      const set = () => { a.currentTime = seek; };
+      if(a.readyState >= 1) set(); else a.addEventListener("loadedmetadata", set, { once:true });
+      a.play().catch(()=>{});
+      a.scrollIntoView({ block:"center" });
+    }
+  }
   const box = document.getElementById("zoombox"), zi = document.getElementById("zoomimg");
   $app.querySelectorAll("[data-zoom]").forEach(img => img.onclick = () => { zi.src = img.src; box.style.display = "block"; box.scrollTop = 0; box.scrollLeft = 0; });
   document.getElementById("zoomclose").onclick = () => { box.style.display = "none"; };
@@ -1597,9 +1608,10 @@ function renderHome(){
           <div class="row"><div class="grow"><b>${esc(st.title)}</b><div class="small muted">${esc(st.desc)} · ${st.questions.length} Fragen</div></div>${stageBadge(s)}</div>
         </div>`;
       }
-      if(ch.materials && ch.materials.length){
+      if((ch.materials && ch.materials.length) || (ch.audios && ch.audios.length)){
+        const kinds = ((ch.audios&&ch.audios.length)?["🎧 Podcast"]:[]).concat((ch.materials||[]).map(m => m.type==="video"?"🎬 Video":"🖼️ Infografik"));
         html += `<div class="card tap" data-mat="${ch.id}" style="margin:10px 0 0;padding:13px;background:var(--accent-soft);border-color:transparent">
-          <div class="row"><div style="font-size:1.4rem">📚</div><div class="grow"><b>Weitere Lernmaterialien</b><div class="small muted">${ch.materials.map(m => m.type==="video"?"🎬 Video":"🖼️ Infografik").join(" · ")}</div></div><span class="muted">›</span></div>
+          <div class="row"><div style="font-size:1.4rem">📚</div><div class="grow"><b>Lernmaterialien</b><div class="small muted">${kinds.join(" · ")}</div></div><span class="muted">›</span></div>
         </div>`;
       }
       html += `</details>`;
@@ -1643,8 +1655,6 @@ function renderSet(setId){
       : `<div class="small muted" style="margin-top:8px">Noch keine Runde gespielt.</div>`;
     html += `</details>`;
   }
-  html += audioBlock(f.ch);
-
   if(st.stage==="new"){
     html += `<div class="steps"><b>So geht's:</b><ol><li>Quiz machen (${f.set.questions.length} Fragen, du kannst zwischendurch aufhören).</li><li>Die Stellen lesen, die du falsch hattest.</li><li>Den Eltern erklären, dann Freigabe.</li><li>Fehlerfragen nochmal beantworten.</li></ol></div>`;
     html += `<button class="btn" id="start">Runde 1 starten</button>`;
@@ -1660,7 +1670,6 @@ function renderSet(setId){
   }
   $app.innerHTML = html;
   bindTopbar({name:"home"});
-  bindAudio(f.ch);
   const on = (id, fn) => { const el = document.getElementById(id); if(el) el.onclick = fn; };
   on("start", () => { startRound(setId, f.set.questions.map(q=>q.id)); go({name:"quiz", setId}); });
   on("cont", () => go({name:"quiz", setId}));
@@ -1808,14 +1817,13 @@ function renderLearn(setId){
     html += `<div class="card">
       <div><span class="ref-page">${esc(item.ref.page)}</span> · <b>${esc(item.ref.topic)}</b></div>
       <div class="small muted" style="margin-top:3px">${esc(item.ref.where)}</div>
-      ${(() => { const au = mainAudio(f.ch); if(!au || item.ref.toc===undefined || !au.toc[item.ref.toc]) return ""; const k = f.ch.audios.indexOf(au); const s = au.toc[item.ref.toc]; return `<button class="speak" data-seek="${s.t}" data-aud="${k}" style="margin-top:8px">🎧 Anhören: „${esc(s.title)}“ ab ${fmtTime(s.t)}</button>`; })()}`;
+      ${(() => { const au = mainAudio(f.ch); if(!au || item.ref.toc===undefined || !au.toc[item.ref.toc]) return ""; const k = f.ch.audios.indexOf(au); const s = au.toc[item.ref.toc]; return `<button class="speak" data-jump="${s.t}" style="margin-top:8px">🎧 Anhören: „${esc(s.title)}“ ab ${fmtTime(s.t)}</button>`; })()}`;
     for(const q of item.qs){
       const a = (st.lastAnswers||{})[q.id];
       html += `<div class="wrongq">${q.context?`<span class="muted">${fmtSub(q.context)}</span><br>`:""}${fmtSub(q.prompt)}<div class="ans-line">Deine Antwort: <span class="ans-bad">${esc(answerText(q, a && a.given))}</span></div></div>`;
     }
     html += `<label class="check"><input type="checkbox" data-read="${item.id}" ${st.read[item.id]?"checked":""}> Gelesen – ich kann's erklären</label></div>`;
   }
-  html += audioBlock(f.ch);
   html += `<div class="steps" style="margin-top:16px"><b>Dann zu deinen Eltern – erkläre für jede Frage:</b><ol>
     <li>Was habe ich geantwortet?</li>
     <li>Warum war das falsch?</li>
@@ -1825,7 +1833,7 @@ function renderLearn(setId){
   html += `<p class="small muted center" id="readhint" style="${allRead?"display:none":""}">Hake erst alle Stellen ab.</p>`;
   $app.innerHTML = html;
   bindTopbar({name:"set", setId});
-  bindAudio(f.ch);
+  $app.querySelectorAll("[data-jump]").forEach(b => b.onclick = () => go({ name:"materials", chId: f.ch.id, seek: parseFloat(b.dataset.jump), back:{name:"learn", setId} }));
   $app.querySelectorAll("[data-read]").forEach(cb => cb.onchange = () => {
     st.read[cb.dataset.read] = cb.checked; saveStore();
     const ok = list.every(item => st.read[item.id]);
