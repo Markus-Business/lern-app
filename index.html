@@ -107,6 +107,8 @@
   .opt:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--ink);background:var(--paper)}
   .opt:disabled{cursor:default;opacity:1;color:var(--ink)}
   .opt.picked-ok{background:var(--green-300)}
+  .opt.sel{background:#f8e0b1;transform:translateY(3px);box-shadow:0 1px 0 var(--ink);outline:3px solid var(--ink);outline-offset:2px}
+  #confirm:disabled{opacity:.45;cursor:default}
   .opt.picked-bad{background:var(--bad-soft)}
   .tfrow{display:flex;gap:12px}
   .tfrow .opt{text-align:center;font-weight:800}
@@ -1827,7 +1829,7 @@ function renderHome(){
 
 function renderHelp(){
   $app.innerHTML = topbar("So funktioniert's", true) + `
-    <div class="card"><span class="tack"></span><h3 style="padding-left:22px">1. Quiz</h3><p>Beantworte alle Fragen. Sag die Antwort zuerst <b>laut</b>, dann tippe sie an. Mit 🔊 wird die Frage vorgelesen.</p></div>
+    <div class="card"><span class="tack"></span><h3 style="padding-left:22px">1. Quiz</h3><p>Beantworte alle Fragen. Sag die Antwort zuerst <b>laut</b>, dann tippe sie an und drücke <b>„Antwort bestätigen“</b>. Bis dahin kannst du dich noch umentscheiden. Mit 🔊 wird die Frage vorgelesen.</p></div>
     <div class="card"><span class="tack"></span><h3 style="padding-left:22px">2. Lernen</h3><p>Du bekommst eine Leseliste: genau die Stellen im Buch, die zu deinen Fehlern gehören.</p></div>
     <div class="card"><span class="tack"></span><h3 style="padding-left:22px">3. Erklären</h3><p>Erkläre deinen Eltern für jeden Fehler: Was hast du geantwortet? Warum war das falsch? Was ist richtig – und warum?</p></div>
     <div class="card"><span class="tack"></span><h3 style="padding-left:22px">4. Freigabe</h3><p>Deine Eltern geben mit ihrem Passwort frei. Dann beantwortest du die Fragen nochmal – so lange, bis alles sitzt.</p></div>`;
@@ -1904,14 +1906,14 @@ function renderQuiz(setId){
     html += `<div class="tfrow">
       <button class="opt ${cls(true)}" data-v="true" ${answered?"disabled":""}>${esc(L[0])}</button>
       <button class="opt ${cls(false)}" data-v="false" ${answered?"disabled":""}>${esc(L[1])}</button></div>`;
-    if(!answered) html += `<div class="tip">Tipp: Sag zuerst laut, ob es stimmt – und warum.</div>`;
+    if(!answered) html += `<button class="btn" id="confirm" disabled>Antwort bestätigen</button><div class="tip">Tipp: Sag zuerst laut, ob es stimmt – und warum.</div>`;
   } else if(q.type==="mc"){
     const order = st.orders[q.id] || q.options.map((_,i)=>i);
     for(const i of order){
       const cls = answered ? (answered.given===i ? (answered.correct?"picked-ok":"picked-bad") : "") : "";
       html += `<button class="opt ${cls}" data-i="${i}" ${answered?"disabled":""}>${fmtSub(q.options[i])}</button>`;
     }
-    if(!answered) html += `<div class="tip">Tipp: Überleg dir die Antwort erst, bevor du die Möglichkeiten liest.</div>`;
+    if(!answered) html += `<button class="btn" id="confirm" disabled>Antwort bestätigen</button><div class="tip">Tipp: Überleg dir die Antwort erst, bevor du die Möglichkeiten liest.</div>`;
   } else {
     html += `<input type="text" id="txt" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Antwort eintippen" ${answered?"disabled":""} value="${answered?esc(answered.given):""}">`;
     if(!answered) html += `<button class="btn" id="submit">Antwort prüfen</button>`;
@@ -1951,8 +1953,17 @@ function renderQuiz(setId){
     saveStore(); render();
   };
   if(!answered){
-    $app.querySelectorAll("[data-v]").forEach(b => b.onclick = () => record(b.dataset.v==="true"));
-    $app.querySelectorAll("[data-i]").forEach(b => b.onclick = () => record(parseInt(b.dataset.i,10)));
+    // Antippen markiert nur; gewertet wird erst nach „Antwort bestätigen“ (bis dahin umentscheiden möglich)
+    let pick = null;
+    const conf = document.getElementById("confirm");
+    const choose = (b, val) => {
+      pick = val;
+      $app.querySelectorAll(".opt").forEach(o => o.classList.toggle("sel", o === b));
+      if(conf){ conf.disabled = false; conf.textContent = "Antwort bestätigen"; }
+    };
+    $app.querySelectorAll("[data-v]").forEach(b => b.onclick = () => choose(b, b.dataset.v==="true"));
+    $app.querySelectorAll("[data-i]").forEach(b => b.onclick = () => choose(b, parseInt(b.dataset.i,10)));
+    if(conf) conf.onclick = () => { if(pick !== null) record(pick); };
     const sub = document.getElementById("submit");
     if(sub){
       const txt = document.getElementById("txt");
