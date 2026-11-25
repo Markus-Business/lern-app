@@ -1460,6 +1460,124 @@ const SUBJECTS = [
       }
     ]
   }
+  ,
+  {
+    id: "kunst",
+    name: "Kunst",
+    icon: "🎨",
+    chapters: [
+      {
+        id: "ku-plastik",
+        icon: "🗿",
+        title: "Plastiken und Skulpturen",
+        book: "Kunstheft + Arbeitsblätter",
+        source: "Kunstheft",
+        refs: {
+          k1plast: { p: 1,   page: "Heft", where: "Seite „Herstellungstechniken“, linke Spalte", topic: "Plastiken: additiv (aufbauend)" },
+          k1bild:  { p: 1.2, page: "Heft", where: "Seite „Herstellungstechniken“, Fotos Giacometti und Jago", topic: "Beispiele: aufbauen und herausschlagen" },
+          k1skul:  { p: 1.5, page: "Heft", where: "Seite „Herstellungstechniken“, rechte Spalte", topic: "Skulpturen: subtraktiv (wegnehmend)" },
+          k2kr:    { p: 2,   page: "Heft", where: "Seite „Die Körper-Raum-Beziehung“ (drei Bilder) und das Arbeitsblatt dazu", topic: "raumabweisend · raumoffen · raumgreifend" },
+          k3ein:   { p: 3,   page: "Heft", where: "Seite „Die Ansichtigkeit von Skulpturen u. Plastiken“, linke Spalte und Fotos 1–2", topic: "Einansichtig" },
+          k3mehr:  { p: 3.5, page: "Heft", where: "Seite „Die Ansichtigkeit …“, rechte Spalte und Fotos 3–4", topic: "Mehransichtig" },
+          k4sock:  { p: 4,   page: "Heft", where: "Seite „Präsentationsformen von Plastiken“, Abschnitt Sockel", topic: "Sockel" },
+          k4plin:  { p: 4.3, page: "Heft", where: "Seite „Präsentationsformen …“, Abschnitt Plinthe", topic: "Plinthe" },
+          k4bod:   { p: 4.6, page: "Heft", where: "Seite „Präsentationsformen …“, Abschnitt Boden", topic: "Boden" },
+          k5tab:   { p: 5,   page: "Heft", where: "Tabelle „Die Oberflächenbeschaffenheit von Skulpturen/Plastiken“", topic: "Welches Material wirkt wie?" },
+          g1graf:  { p: 6,   page: "AB S. 2", where: "Arbeitsblatt „Grafische Mittel“, Einleitung", topic: "Was Grafik ist" },
+          g1mitt:  { p: 6.1, page: "AB S. 2", where: "Arbeitsblatt „Grafische Mittel“, Punkt, Linie, Fläche", topic: "Grafische Mittel" },
+          g1par:   { p: 6.2, page: "AB S. 2", where: "Kasten „Parallelschraffur“", topic: "Parallelschraffur" },
+          g1kreuz: { p: 6.3, page: "AB S. 2", where: "Kasten „Kreuzschraffur“", topic: "Kreuzschraffur" },
+          g1form:  { p: 6.4, page: "AB S. 2", where: "Kasten „Formlinienschraffur“", topic: "Formlinienschraffur" },
+          g1punkt: { p: 6.5, page: "AB S. 2", where: "Kasten „Punktieren“", topic: "Punktieren" },
+          g1schum: { p: 6.6, page: "AB S. 2", where: "Kasten „Schummern“", topic: "Schummern" },
+          g2binn:  { p: 7,   page: "AB S. 4", where: "„Gestalten von Plastizität durch Schraffuren“, erster Absatz", topic: "Binnen- bzw. Körperschatten" },
+          g2schl:  { p: 7.3, page: "AB S. 4", where: "„Gestalten von Plastizität …“, zweiter Absatz", topic: "Schlagschatten" },
+          g2licht: { p: 7.6, page: "AB S. 4", where: "„Probiere es nun selbst“ (Lichtquelle überlegen)", topic: "Licht und Schatten planen" },
+          k6david: { p: 8,   page: "AB", where: "Arbeitsblatt „Dir liegt folgendes Werk vor“ (Michelangelo, David)", topic: "David von Michelangelo" }
+        },
+        sets: [
+          {
+            id: "ku-plastik-grund",
+            title: "Plastik und Skulptur (KA-Themen 1–5)",
+            desc: "Herstellung, Körper-Raum-Beziehung, Ansichtigkeit, Präsentation und Material.",
+            questions: [
+              { id:"k1", type:"tf", section:"Herstellung", prompt:"Plastiken werden additiv, also aufbauend, hergestellt.", answer:true, explain:"Wahr. Der Künstler formt das Objekt nach und nach aus Ton, Wachs, Gips oder Modelliermasse.", refs:["k1plast"] },
+              { id:"k2", type:"tf", section:"Herstellung", prompt:"Skulpturen werden additiv, also aufbauend, hergestellt.", answer:false, explain:"Falsch. Skulpturen entstehen subtraktiv, also wegnehmend: Der Künstler schnitzt oder schlägt das Objekt heraus.", refs:["k1skul"] },
+              { id:"k3", type:"mc", section:"Herstellung", prompt:"Was bedeutet „subtraktiv“?", options:["wegnehmend","aufbauend","gießend","zusammenklebend"], answer:0, explain:"subtraktiv = wegnehmend (wie Subtraktion = Minus). additiv = aufbauend (wie Addition = Plus).", refs:["k1skul"] },
+              { id:"k4", type:"mc", section:"Herstellung", prompt:"Aus welchen Materialien entsteht typischerweise eine Plastik?", options:["Ton, Wachs, Gips oder Modelliermasse","Stein, Marmor oder Holz","Nur aus Marmor","Nur aus Holz"], answer:0, explain:"Weiche, formbare Materialien → Plastik. Stein, Marmor, Holz → Skulptur.", refs:["k1plast"] },
+              { id:"k5", type:"mc", section:"Herstellung", prompt:"Aus welchen Materialien entsteht typischerweise eine Skulptur?", options:["Stein, Marmor oder Holz","Ton, Wachs oder Gips","Modelliermasse","Wachs und Bronze"], answer:0, explain:"Aus festem Material wird etwas weggenommen: Stein, Marmor, Holz.", refs:["k1skul"] },
+              { id:"k6", type:"tf", section:"Herstellung", prompt:"Das Gießen von Metall, z. B. Bronze, gehört zu den Plastiken.", answer:true, explain:"Wahr. So steht es im Heft: Auch das Gießen von Metall gehört dazu.", refs:["k1plast"] },
+              { id:"k7", type:"tf", labels:["Plastik","Skulptur"], section:"Plastik oder Skulptur?", prompt:"Ein Künstler formt nach und nach eine Figur aus Ton.", answer:true, explain:"Plastik – er baut auf (additiv).", refs:["k1plast"] },
+              { id:"k8", type:"tf", labels:["Plastik","Skulptur"], section:"Plastik oder Skulptur?", prompt:"Ein Bildhauer schlägt mit Hammer und Meißel eine Figur aus einem Marmorblock.", answer:false, explain:"Skulptur – er nimmt Material weg (subtraktiv).", refs:["k1skul"] },
+              { id:"k9", type:"tf", labels:["Plastik","Skulptur"], section:"Plastik oder Skulptur?", prompt:"Eine Figur wird aus einem Holzstamm geschnitzt.", answer:false, explain:"Skulptur – Schnitzen nimmt Holz weg.", refs:["k1skul"] },
+              { id:"k10", type:"tf", labels:["Plastik","Skulptur"], section:"Plastik oder Skulptur?", prompt:"Eine Figur wird aus Wachs geformt und danach in Bronze gegossen.", answer:true, explain:"Plastik – Formen und Gießen gehören zum Aufbauen.", refs:["k1plast"] },
+              { id:"k11", type:"mc", section:"Plastik oder Skulptur?", context:"Foto im Heft: Alberto Giacometti formt mit den Händen eine Figur aus weicher Masse.", prompt:"Was entsteht hier?", options:["Eine Plastik – er arbeitet additiv","Eine Skulptur – er arbeitet subtraktiv","Eine Skulptur – er arbeitet additiv","Eine Grafik"], answer:0, explain:"Mit den Händen aufbauen = additiv = Plastik.", refs:["k1bild","k1plast"] },
+              { id:"k12", type:"mc", section:"Plastik oder Skulptur?", context:"Foto im Heft: Der Bildhauer Jago arbeitet mit einem Werkzeug an einer großen Figur aus weißem Stein.", prompt:"Was entsteht hier?", options:["Eine Skulptur – er arbeitet subtraktiv","Eine Plastik – er arbeitet additiv","Eine Plastik – er arbeitet subtraktiv","Ein Bronzeguss"], answer:0, explain:"Aus Stein herausarbeiten = wegnehmen = Skulptur.", refs:["k1bild","k1skul"] },
+
+              { id:"r1", type:"mc", section:"Körper-Raum-Beziehung", prompt:"Welche drei Arten der Körper-Raum-Beziehung kennst du?", options:["raumabweisend, raumoffen, raumgreifend","einansichtig, mehransichtig, rundum","Sockel, Plinthe, Boden","additiv, subtraktiv, gegossen"], answer:0, explain:"raumabweisend (Kernplastik), raumoffen, raumgreifend.", refs:["k2kr"] },
+              { id:"r2", type:"mc", section:"Körper-Raum-Beziehung", prompt:"Wie nennt man eine raumabweisende Figur noch?", options:["Kernplastik","Nischenplastik","Relief","Plinthe"], answer:0, explain:"Im Heft: „raumabweisend oder Kernplastik“.", refs:["k2kr"] },
+              { id:"r3", type:"mc", section:"Körper-Raum-Beziehung", prompt:"Eine Figur ist kompakt und geschlossen. Arme und Beine liegen eng am Körper. Wie ist ihre Körper-Raum-Beziehung?", options:["raumabweisend","raumgreifend","raumoffen","mehransichtig"], answer:0, explain:"Geschlossene Form, nichts ragt in den Raum → raumabweisend (wie „Der Winter“, die Frierende, die sich in ihr Tuch wickelt).", refs:["k2kr"] },
+              { id:"r4", type:"mc", section:"Körper-Raum-Beziehung", prompt:"Eine Figur streckt einen Arm weit in den Raum hinaus. Wie ist ihre Körper-Raum-Beziehung?", options:["raumgreifend","raumabweisend","raumoffen","einansichtig"], answer:0, explain:"Die Figur „greift“ in den Raum → raumgreifend (wie die Athene von Velletri mit ausgestrecktem Arm).", refs:["k2kr"] },
+              { id:"r5", type:"mc", section:"Körper-Raum-Beziehung", prompt:"Eine Figur hat Löcher und Öffnungen, durch die man hindurchsehen kann. Der Raum dringt in die Figur ein. Wie ist ihre Körper-Raum-Beziehung?", options:["raumoffen","raumabweisend","raumgreifend","einansichtig"], answer:0, explain:"Raum geht durch die Figur hindurch → raumoffen (wie „Seated Man“).", refs:["k2kr"] },
+              { id:"r6", type:"mc", section:"Körper-Raum-Beziehung", prompt:"Welches Beispiel aus dem Heft ist raumgreifend?", options:["Athene von Velletri","Der Winter (Die Frierende)","Seated Man","Alle drei"], answer:0, explain:"Athene von Velletri = raumgreifend, Der Winter = raumabweisend, Seated Man = raumoffen.", refs:["k2kr"] },
+              { id:"r7", type:"mc", section:"Körper-Raum-Beziehung", prompt:"Welches Beispiel aus dem Heft ist raumabweisend (Kernplastik)?", options:["Der Winter (Die Frierende)","Athene von Velletri","Seated Man","Keins davon"], answer:0, explain:"Die Frierende hält ihr Tuch eng um sich – nichts ragt nach außen.", refs:["k2kr"] },
+
+              { id:"a1", type:"mc", section:"Ansichtigkeit", prompt:"Welche Werke sind typischerweise einansichtig?", options:["Reliefs und Nischenplastiken (z. B. in Kirchen)","Freistehende Voll- oder Rundplastiken","Alle Bronzefiguren","Figuren auf dem Boden"], answer:0, explain:"Reliefs und Nischenplastiken schaut man nur von vorn an.", refs:["k3ein"] },
+              { id:"a2", type:"tf", section:"Ansichtigkeit", prompt:"Bei einansichtigen Skulpturen gibt es einen festen Standort der Betrachtung.", answer:true, explain:"Wahr. Man steht davor – meist von vorn.", refs:["k3ein"] },
+              { id:"a3", type:"tf", section:"Ansichtigkeit", prompt:"Mehransichtige Plastiken bieten wechselnde Betrachtungsmöglichkeiten.", answer:true, explain:"Wahr. Man kann um freistehende Voll- oder Rundplastiken herumgehen.", refs:["k3mehr"] },
+              { id:"a4", type:"mc", section:"Ansichtigkeit", context:"Im Heft siehst du eine Figur von vorn und von hinten. Die Rückseite ist kaum ausgearbeitet.", prompt:"Was sagt das über die Ansichtigkeit?", options:["Sie ist einansichtig – gemacht, um von vorn angeschaut zu werden","Sie ist mehransichtig","Sie ist raumgreifend","Sie ist eine Plastik"], answer:0, explain:"Wenn die Rückseite nicht gestaltet ist, soll man sie nur von vorn sehen (z. B. in einer Nische).", refs:["k3ein"] },
+              { id:"a5", type:"tf", section:"Ansichtigkeit", prompt:"Eine freistehende Figurengruppe, die von allen Seiten ausgearbeitet ist, ist einansichtig.", answer:false, explain:"Falsch. Sie ist mehransichtig – wie die Marmorgruppe rechts auf der Heftseite.", refs:["k3mehr"] },
+
+              { id:"p1", type:"mc", section:"Präsentationsformen", prompt:"Welche drei Präsentationsformen hast du gelernt?", options:["Sockel, Plinthe, Boden","Relief, Nische, Rundplastik","raumabweisend, raumoffen, raumgreifend","Ton, Stein, Bronze"], answer:0, explain:"Sockel, Plinthe und Boden.", refs:["k4sock","k4plin","k4bod"] },
+              { id:"p2", type:"mc", section:"Präsentationsformen", prompt:"Wie wirkt eine Figur auf einem Sockel?", options:["Mächtiger – der Betrachter muss hinaufschauen","Ebenbürtig – auf Augenhöhe","Real und menschlich","Kleiner und unwichtiger"], answer:0, explain:"Der Sockel hebt die Figur vom Boden ab.", refs:["k4sock"] },
+              { id:"p3", type:"mc", section:"Präsentationsformen", prompt:"Wie wirkt eine Figur auf einer Plinthe?", options:["Ebenbürtig bzw. gleichberechtigt – nahezu auf Augenhöhe","Mächtiger – man schaut hinauf","Real und menschlich, weil sie auf dem Boden steht","Bedrohlich"], answer:0, explain:"Durch die Plinthe steht die Figur nahezu auf Augenhöhe des Betrachters.", refs:["k4plin"] },
+              { id:"p4", type:"mc", section:"Präsentationsformen", prompt:"Wie wirkt eine Figur, die direkt auf dem Boden steht?", options:["Real und menschlich","Mächtiger","Ebenbürtig auf Augenhöhe","Unwichtig"], answer:0, explain:"So steht es im Heft: Das wirkt real und menschlich.", refs:["k4bod"] },
+              { id:"p5", type:"tf", section:"Präsentationsformen", prompt:"Ein Sockel lässt eine Figur kleiner und unscheinbarer wirken.", answer:false, explain:"Falsch. Ein Sockel lässt sie mächtiger wirken.", refs:["k4sock"] },
+
+              { id:"m1", type:"mc", section:"Material (Tabelle)", prompt:"Wie fühlt sich Stein laut deiner Tabelle an?", options:["rau, hart und schwer","glatt und eben","leicht und geriffelt","uneben und splittrig"], answer:0, explain:"Stein: rau, hart, schwer.", refs:["k5tab"] },
+              { id:"m2", type:"mc", section:"Material (Tabelle)", prompt:"Wie fühlt sich Holz laut deiner Tabelle an?", options:["uneben und splittrig","glatt und spiegelnd","rau, hart und schwer","leicht und geriffelt"], answer:0, explain:"Holz (Ast/Platte): uneben, splittrig.", refs:["k5tab"] },
+              { id:"m3", type:"mc", section:"Material (Tabelle)", prompt:"Wie sieht Metall (Kerzenständer) laut deiner Tabelle aus?", options:["glänzend und spiegelnd","rau und unförmig","schichtig und gestreift","uneben"], answer:0, explain:"Metall: fühlt sich glatt an, sieht glänzend und spiegelnd aus.", refs:["k5tab"] },
+              { id:"m4", type:"mc", section:"Material (Tabelle)", prompt:"Wie fühlt sich Porzellan (Vase) laut deiner Tabelle an?", options:["glatt und eben","rau und schwer","splittrig","geriffelt"], answer:0, explain:"Porzellan: glatt, eben.", refs:["k5tab"] },
+              { id:"m5", type:"mc", section:"Material (Tabelle)", prompt:"Welches Material ist laut deiner Tabelle leicht und geriffelt und sieht schichtig bzw. gestreift aus?", options:["Kunststoff","Stein","Metall","Porzellan"], answer:0, explain:"Kunststoff: leicht, geriffelt, schichtig/gestreift.", refs:["k5tab"] }
+            ]
+          },
+          {
+            id: "ku-plastik-schraffur",
+            title: "Schraffuren und Anwendung am David (KA-Thema 6)",
+            desc: "Grafische Mittel, vier Schraffurtechniken, Schummern, Licht und Schatten – und alles am David angewendet.",
+            questions: [
+              { id:"s1", type:"mc", section:"Grafik", prompt:"Was bezeichnet man als Grafik?", options:["Werke, die zeichnerisch gestaltet sind – auch Drucke wie Holz- oder Kupferstiche","Nur Fotos","Figuren aus Stein und Holz","Nur farbige Gemälde"], answer:0, explain:"Zeichnungen und Drucktechniken wie Holz- oder Kupferstich gehören zur Grafik.", refs:["g1graf"] },
+              { id:"s2", type:"mc", section:"Grafik", prompt:"Welche grafischen Mittel stehen dir zur Verfügung?", options:["Punkt, Linie, Fläche","Sockel, Plinthe, Boden","Ton, Wachs, Gips","Pinsel, Farbe, Leinwand"], answer:0, explain:"Punkt, Linie und Fläche.", refs:["g1mitt"] },
+              { id:"s3", type:"mc", section:"Grafik", prompt:"Wie gestaltest du eine Fläche?", options:["Indem du mehrere Linien oder Punkte aneinandersetzt (Schraffur)","Indem du nur die Umrisslinie zeichnest","Indem du radierst","Indem du einen einzigen Punkt setzt"], answer:0, explain:"Linien oder Punkte aneinandersetzen = Schraffur.", refs:["g1mitt"] },
+              { id:"s4", type:"mc", section:"Grafik", prompt:"Welche Linienarten zeigt das Arbeitsblatt?", options:["abschwellend, anschwellend, lebendig, tot","gerade, krumm, gestrichelt, gepunktet","dick, dünn, rot, blau","Parallel-, Kreuz-, Form-, Punktlinie"], answer:0, explain:"Abschwellende, anschwellende, lebendige und „tote“ Linie.", refs:["g1mitt"] },
+              { id:"s5", type:"mc", section:"Schraffurtechniken", prompt:"Gerade, parallele Linien werden nebeneinander gesetzt. Wie heißt diese Technik?", options:["Parallelschraffur","Kreuzschraffur","Formlinienschraffur","Schummern"], answer:0, explain:"Parallelschraffur.", refs:["g1par"] },
+              { id:"s6", type:"mc", section:"Schraffurtechniken", prompt:"Parallelschraffuren werden so übereinandergesetzt, dass sich die Linien kreuzen. Wie heißt diese Technik?", options:["Kreuzschraffur","Parallelschraffur","Punktieren","Formlinienschraffur"], answer:0, explain:"Kreuzschraffur.", refs:["g1kreuz"] },
+              { id:"s7", type:"mc", section:"Schraffurtechniken", prompt:"Die Linien folgen der Rundung eines Körpers. Wie heißt diese Technik?", options:["Formlinienschraffur","Parallelschraffur","Kreuzschraffur","Schummern"], answer:0, explain:"Formlinienschraffur. Die Linien können sich dabei kreuzen oder parallel verlaufen.", refs:["g1form"] },
+              { id:"s8", type:"mc", section:"Schraffurtechniken", prompt:"Durch das Aneinandersetzen von Punkten entsteht der Eindruck einer Fläche. Wie heißt diese Technik?", options:["Punktieren","Schummern","Kreuzschraffur","Parallelschraffur"], answer:0, explain:"Punktieren.", refs:["g1punkt"] },
+              { id:"s9", type:"mc", section:"Schraffurtechniken", prompt:"Wie funktioniert Schummern?", options:["Mit der breiten Stiftseite in leichten, kreisenden Bewegungen auftragen, dann mit Verwischer oder Finger verwischen","Mit der Stiftspitze fest gerade Linien ziehen","Viele Punkte nebeneinandersetzen","Linien kreuzweise übereinanderlegen"], answer:0, explain:"Breite Stiftseite, leicht kreisen, verwischen.", refs:["g1schum"] },
+              { id:"s10", type:"tf", section:"Schraffurtechniken", prompt:"Bei der Formlinienschraffur können sich die Linien kreuzen oder parallel verlaufen.", answer:true, explain:"Wahr. Wichtig ist nur: Sie folgen der Rundung.", refs:["g1form"] },
+              { id:"s11", type:"tf", section:"Schraffurtechniken", prompt:"Beim Schummern drückt man mit der Stiftspitze fest auf.", answer:false, explain:"Falsch. Man nimmt die breite Stiftseite und arbeitet mit leichten, kreisenden Bewegungen.", refs:["g1schum"] },
+
+              { id:"l1", type:"mc", section:"Licht und Schatten", prompt:"Wodurch wirkt ein gezeichneter Körper plastisch?", options:["Durch Hell-Dunkel-Unterschiede beim Schraffieren – es entstehen Binnen- bzw. Körperschatten","Durch eine besonders dicke Umrisslinie","Durch bunte Farben","Durch einen Sockel"], answer:0, explain:"So wird aus einer Konturlinie ein Körper.", refs:["g2binn"] },
+              { id:"l2", type:"mc", section:"Licht und Schatten", prompt:"Welches Wort bedeutet dasselbe wie Binnenschatten?", options:["Körperschatten","Schlagschatten","Konturlinie","Formlinie"], answer:0, explain:"Binnenschatten = Körperschatten (der Schatten auf dem Körper selbst).", refs:["g2binn"] },
+              { id:"l3", type:"mc", section:"Licht und Schatten", prompt:"Was zeigt der Schlagschatten?", options:["Dass der Körper auf einem Untergrund steht","Dass der Körper hohl ist","Dass der Körper aus Metall ist","Wie schwer der Körper ist"], answer:0, explain:"Der Schlagschatten fällt auf den Untergrund – der Körper „steht“ dadurch.", refs:["g2schl"] },
+              { id:"l4", type:"mc", section:"Licht und Schatten", prompt:"Was sollst du dir vor dem Schraffieren einer Kugel überlegen?", options:["Woher das Licht kommt, welche Stellen hell bzw. dunkel werden und wohin der Schlagschatten fällt","Welche Farbe die Kugel hat","Wie groß das Blatt ist","Ob die Kugel aus Stein ist"], answer:0, explain:"Lichtquelle → helle und dunkle Stellen → Richtung des Schlagschattens.", refs:["g2licht"] },
+              { id:"l5", type:"mc", section:"Licht und Schatten", prompt:"Das Licht kommt von links oben. Wo ist die Kugel am hellsten?", options:["Links oben","Rechts unten","Genau in der Mitte unten","Überall gleich"], answer:0, explain:"Die Seite, die zum Licht zeigt, ist am hellsten. Die abgewandte Seite (rechts unten) ist am dunkelsten.", refs:["g2licht","g2binn"] },
+              { id:"l6", type:"mc", section:"Licht und Schatten", prompt:"Das Licht kommt von links oben. Wohin fällt der Schlagschatten?", options:["Nach rechts auf den Boden – weg vom Licht","Nach links zum Licht hin","Nach oben","Es gibt keinen Schlagschatten"], answer:0, explain:"Der Schlagschatten fällt immer auf die Seite, die vom Licht abgewandt ist.", refs:["g2licht","g2schl"] },
+
+              { id:"v1", type:"mc", section:"Anwendung: David", prompt:"Welche Angaben zum David stimmen?", options:["Michelangelo Buonarroti, 1501–1504, Marmor, 5,16 m hoch, Florenz","Alberto Giacometti, 1950, Bronze, 1,80 m hoch, Paris","Michelangelo Buonarroti, 1801–1804, Holz, 2,50 m hoch, Rom","Jago, 2020, Marmor, 5,16 m hoch, Florenz"], answer:0, explain:"Michelangelo Buonarroti, David, 1501–1504, Marmor, 5,16 m, ca. 5,5 Tonnen, Galleria dell’Accademia, Florenz. Achtung Schreibweise: Marmor (mit r) – auf dem Blatt steht „Mamor“.", refs:["k6david"] },
+              { id:"v2", type:"mc", section:"Anwendung: David", prompt:"Welchen Moment zeigt die Skulptur?", options:["David kurz bevor er den Kampf gegen Goliath antritt","David nach seinem Sieg über Goliath","David beim Wurf mit der Steinschleuder","Goliath vor dem Kampf"], answer:0, explain:"Der Moment kurz vor dem Kampf.", refs:["k6david"] },
+              { id:"v3", type:"tf", labels:["Plastik","Skulptur"], section:"Anwendung: David", prompt:"Ist Michelangelos David eine Plastik oder eine Skulptur?", answer:false, explain:"Skulptur: Er ist aus Marmor herausgeschlagen (subtraktiv).", refs:["k6david","k1skul"] },
+              { id:"v4", type:"mc", section:"Anwendung: David", prompt:"Der David steht auf einem hohen Sockel. Welche Wirkung hat das?", options:["Er wirkt mächtiger – man muss zu ihm hinaufschauen","Er wirkt ebenbürtig auf Augenhöhe","Er wirkt real und menschlich","Er wirkt kleiner"], answer:0, explain:"Sockel → Betrachter schaut hinauf → Figur wirkt mächtiger. Passt zum Helden David.", refs:["k6david","k4sock"] },
+              { id:"v5", type:"mc", section:"Anwendung: David", prompt:"Die Fotos zeigen den David von mehreren Seiten, er steht frei im Raum. Wie ist seine Ansichtigkeit?", options:["Mehransichtig – man kann um ihn herumgehen","Einansichtig – nur von vorn","Er ist ein Relief","Das kann man nicht sagen"], answer:0, explain:"Freistehende Rundplastik → mehransichtig, wechselnde Betrachtungsmöglichkeiten.", refs:["k6david","k3mehr"] },
+              { id:"v6", type:"mc", section:"Anwendung: David", prompt:"Du sollst eine Goliath-Skulptur zeichnen. Womit zeigst du, dass sie auf dem Boden steht?", options:["Mit einem Schlagschatten","Mit einer dicken Umrisslinie","Mit Punktieren im Gesicht","Gar nicht – das sieht man immer"], answer:0, explain:"Der Schlagschatten zeigt, dass der Körper auf einem Untergrund steht.", refs:["g2schl"] }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+
 ];
 
 /* =========================================================
@@ -2014,11 +2132,11 @@ function renderLearn(setId){
   let html = topbar("Deine Leseliste", true);
   html += `<div class="card"><div class="row"><div class="grow"><b>Runde ${last.round}</b><div class="small muted">${last.correct} von ${last.total} richtig</div></div><span class="badge b-learn">${st.wrong.length} offen</span></div></div>`;
   html += `<div class="steps"><b>So lernst du:</b><ol>
-    <li>Lies die Stelle im Buch.</li>
-    <li>Buch zu.</li>
+    <li>Lies die Stelle im ${esc(f.ch.source||"Buch")}.</li>
+    <li>${esc(f.ch.source||"Buch")} zu.</li>
     <li>Hake ab, wenn du es erklären kannst.</li>
   </ol></div>`;
-  html += `<h2>${list.length} ${list.length===1?"Stelle":"Stellen"} im Buch</h2>`;
+  html += `<h2>${list.length} ${list.length===1?"Stelle":"Stellen"} im ${esc(f.ch.source||"Buch")}</h2>`;
   for(const item of list){
     html += `<div class="card">
       <div><span class="ref-page">${esc(item.ref.page)}</span> · <b>${esc(item.ref.topic)}</b></div>
